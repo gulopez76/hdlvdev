@@ -1,0 +1,337 @@
+<?php
+/**
+ * @file
+ * Retrieves email for posting as nodes and comments.
+ */
+
+// Menu prefix for mailhandler mailboxes. Makes cherry-picking between D6/D7 branches easier.
+define('MAILHANDLER_MENU_PREFIX', 'admin/build');
+
+/**
+ * Implementation of hook_perm().
+ */
+function mailhandler_perm() {
+  return array('administer mailhandler');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function mailhandler_menu() {
+  $items['mailhandler/mailbox_test'] = array(
+    'page callback' => '_mailhandler_mailbox_test',
+    'access arguments' => array('administer mailhandler'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_help().
+ */
+function mailhandler_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#mailhandler':
+      // Return a line-break version of README.txt and INSTALL.txt.
+      $help = "README.txt\n";
+      $help .= "==========\n";
+      $help .= file_get_contents( dirname(__FILE__) . "/README.txt");
+      $help .= "\nINSTALL.txt\n";
+      $help .= "===========\n";
+      $help .= file_get_contents( dirname(__FILE__) . "/INSTALL.txt");
+      return filter_filter('process', 1, NULL, $help);
+    case MAILHANDLER_MENU_PREFIX . '/mailhandler/add':
+      return t('Please see the <a href="@handbook-page">handbook page on configuring mailboxes</a> for additional help.', array('@handbook-page' => url('http://drupal.org/node/207366')));
+    case MAILHANDLER_MENU_PREFIX . '/feeds/edit/%':
+      if ($arg[6] == 'MailhandlerParser') {
+        return t('Please see the <a href="@handbook-page">handbook page on configuring commands</a> for additional help.', array('@handbook-page' => url('http://drupal.org/node/1158574')));
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_ctools_plugin_type().
+ */
+function mailhandler_ctools_plugin_type() {
+  return array(
+    'authenticate' => array(),
+    'commands' => array(),
+    'filters' => array(),
+    'retrieve' => array(),
+  );
+}
+
+/**
+ * Implementation of hook_ctools_plugin_directory().
+ */
+function mailhandler_ctools_plugin_directory($module, $plugin) {
+  return 'plugins/' . $module . '/' . $plugin;
+}
+
+/**
+ * Implementation of hook_filter().
+ */
+function mailhandler_filter($op, $delta = 0, $format = -1, $text = '', $cache_id = 0) {
+  switch ($op) {
+    case 'list':
+      return _mailhandler_filter_list();
+
+    case 'description':
+      return _mailhandler_filter_description($delta);
+
+    case 'process':
+      return _mailhandler_filter_process($delta, $format, $text, $cache_id);
+
+    case 'settings':
+      return _mailhandler_filter_settings($format);
+
+    default:
+      return $text;
+  }
+}
+
+/**
+ * Implementation of hook_coder_ignore().
+ */
+function mailhandler_coder_ignore() {
+  return array(
+    'path' => drupal_get_path('module', 'mailhandler'),
+    'line prefix' => drupal_get_path('module', 'mailhandler'),
+  );
+}
+
+/**
+ * Implementation of hook_hook_info().
+ */
+function mailhandler_hook_info() {
+  return array(
+    'mailhandler' => array(
+      'mailhandler_auth' => array(
+        'auth_failed' => array(
+          'runs when' => t('When authentication fails on Mailhandler mail parsing'),
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_mailhandler_auth().
+ */
+function mailhandler_mailhandler_auth($op, $message) {
+  if ($op != 'auth_failed' || !module_exists('trigger')) {
+    return;
+  }
+  $aids = _trigger_get_hook_aids('mailhandler_auth', $op);
+  $context = array(
+    'hook' => 'mailhandler_auth',
+    'op' => $op,
+    'message' => $message,
+  );
+  actions_do(array_keys($aids), $message, $context);
+}
+
+/**
+ * Wrapper to load any class type.
+ */
+function mailhandler_plugin_load_class($module, $plugin, $type, $id, $args = NULL) {
+  ctools_include('plugins');
+  if ($class = ctools_plugin_load_class($module, $type, $plugin, 'handler')) {
+    return new $class($args);
+  }
+}
+
+/**
+ * Wrapper to load plugins.
+ *
+ * @param $type
+ *   String - type of mailhandler plugins to retrieve.
+ */
+function mailhandler_get_plugins($module, $type) {
+  ctools_include('plugins');
+  $plugins = ctools_get_plugins($module, $type);
+  $result = array();
+  $weights = array();
+  foreach ($plugins as $key => $info) {
+    if (!empty($info['hidden'])) {
+      continue;
+    }
+    if (!isset($info['weight'])) {
+      $info['weight'] = 10;
+    }
+    $weights[] = $info['weight'];
+    $result[$key] = $info;
+  }
+  array_multisort($weights, $result);
+  return $result;
+}
+
+/**
+ * Load a mailbox.
+ *
+ * @param $mail
+ *   This mailbox's name value.
+ * @return
+ *   A mailbox object.
+ */
+function mailhandler_mailbox_load($mail) {
+  ctools_include('export');
+  return ctools_export_crud_load('mailhandler_mailbox', $mail);
+}
+
+/**
+ * Load all mailboxes.
+ *
+ * @param $show_disabled
+ *   If TRUE, will return disabled mailboxes.
+ * @return
+ *   An array of mailbox objects.
+ */
+function mailhandler_mailbox_load_all($show_disabled = TRUE) {
+  ctools_include('export');
+  $mailboxes = ctools_export_crud_load_all('mailhandler_mailbox');
+  foreach ($mailboxes as $mail => $mailbox) {
+    if (isset($mailbox->disabled) && $mailbox->disabled && !$show_disabled) {
+      unset($mailboxes[$mail]);
+    }
+  }
+  return $mailboxes;
+}
+
+/**
+ * Unified status- and error-reporting function.
+ *
+ * @param $type
+ *   One of 'status', 'warning', or 'error'.
+ * @param $message
+ *   Tokenized message to display / log.
+ * @param $variables
+ *   Array of sanitized variables to replace in message.
+ */
+function mailhandler_report($type, $message, $variables = array()) {
+  drupal_set_message(t($message, $variables), $type);
+  $mapping = array(
+    'status' => WATCHDOG_INFO,
+    'warning' => WATCHDOG_WARNING,
+    'error' => WATCHDOG_ERROR,
+  );
+  watchdog('mailhandler', $message, $variables, $mapping[$type]);
+  if ($type == 'error') {
+    throw new Exception(t($message, $variables));
+  }
+}
+
+function _mailhandler_filter_list() {
+  return array(
+    0 => t('Mailhandler signature remover'),
+    1 => t('Mailhandler quoted text fixer'),
+  );
+}
+
+function _mailhandler_filter_description($delta = 0) {
+  switch ($delta) {
+    case 0:
+      return t('Strips signatures from emails.');
+    case 1:
+      return t('Removes leading carets from quoted text');
+  }
+}
+
+function _mailhandler_filter_process($delta = 0, $format = -1, $text = '', $cache_id = 0) {
+  switch ($delta) {
+    case '0':
+      $strip_body_regex = variable_get("mailhandler_filter_$format", '-- ') . "\n";
+      $sig_index = strpos($text, $strip_body_regex);
+      if ($sig_index !== FALSE) {
+        $text = drupal_substr($text, 0, $sig_index);
+      }
+      return $text;
+    case '1':
+      $lines = explode("\n", $text);
+      foreach ($lines as $i => $line) {
+        $lines[$i] = ltrim($line, '> ');
+      }
+      $text = implode("\n", $lines);
+      return $text;
+  }
+}
+
+function _mailhandler_filter_settings($format) {
+  $form['mailhandler_filter'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Strip signature'),
+    '#collapsible' => TRUE,
+  );
+  $form['mailhandler_filter']["sig_separator_$format"] = array(
+    '#type' => 'textfield',
+    '#title' => t('Signature separator'),
+    '#default_value' => variable_get("mailhandler_filter_$format", '-- '),
+    '#description' => t('After the first line matching this string, any further text will be hidden. A typical value is <strong>"-- "</strong> that is two dashes followed by a blank in an otherwise empty line. Leave blank to include signature text in nodes.'),
+  );
+  return $form;
+}
+
+/**
+ * Determines 'from' address.
+ *
+ * Determines 'from' address using either the mailbox setting or via the header.
+ *
+ * @param $header
+ *   Object message header information
+ * @param $mailbox
+ *   Array mailbox settings
+ * @return
+ *   Array of the 'from' address and 'from' name
+ */
+function _mailhandler_get_fromaddress($header, $mailbox) {
+  $fromheader = drupal_strtolower($mailbox->settings['fromheader']);
+  $from = $header->$fromheader;
+  return array($from[0]->mailbox . '@' . $from[0]->host, (isset($from[0]->personal)) ? $from[0]->personal : '');
+}
+
+/**
+ * Builds an options array for a select field from a source array.
+ */
+function _mailhandler_build_options($source, $key_name = 'name') {
+  $options = array();
+  foreach ($source as $key => $value) {
+    $options[$key] = is_object($value) ? $value->$key_name : $value[$key_name];
+  }
+  return $options;
+}
+
+/**
+ * Helper form element validator: integer > 0.
+ */
+function _mailhandler_element_validate_integer_positive($element, &$form_state) {
+  $value = $element['#value'];
+  if ($value !== '' && (!is_numeric($value) || intval($value) != $value || $value < 0)) {
+    form_error($element, t('%name must be a positive integer.', array('%name' => $element['#title'])));
+  }
+}
+
+function _mailhandler_mailbox_test() {
+  $form_state = array('values' => $_POST);
+  $mailbox = (object)$form_state['values'];
+  $output = _mailhandler_mailbox_test_output($mailbox);
+  return drupal_json(array('status' => TRUE, 'data' => $output));
+}
+
+function _mailhandler_mailbox_test_output($mailbox) {
+  $output = '<div id="mailhandler_test_results" class="form-wrapper">';
+  // Call the test function.
+  if ($class = mailhandler_plugin_load_class('mailhandler', $mailbox->settings['retrieve'], 'retrieve', 'handler')) {
+    $ret = $class->test($mailbox);
+  }
+  foreach ($ret as $message) {
+    $output .= '<div class="messages ' . $message['severity'] . '">' . $message['message'] . '</div>';
+  }
+  $output .= "</div>";
+  return $output;
+}
+
+function _mailhandler_include_js($form_element, &$form_state) {
+  drupal_add_js(drupal_get_path('module', 'mailhandler') . '/mailhandler.js');
+  return $form_element;
+}

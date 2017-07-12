@@ -1,0 +1,278 @@
+<?php
+/**
+ * @file
+ * Tests for Mailhandler modules.
+ */
+
+class MailhandlerTestCase extends DrupalWebTestCase {
+  protected $mailhandler_user;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Mailbox creation and import',
+      'description' => 'Create mailboxes and feeds importers and make sure they work.',
+      'group' => 'Mailhandler',
+    );
+  }
+
+  public function setUp() {
+    // Enable any modules required for the test
+    parent::setUp('taxonomy', 'ctools', 'feeds', 'features', 'strongarm', 'job_scheduler', 'feeds_ui', 'autoload', 'mailhandler', 'mailhandler_php_imap', 'mailhandler_default', 'content', 'filefield', 'text');
+    // Create and log in our privileged user.
+    $permissions = array('administer nodes', 'administer mailhandler', 'administer feeds', 'administer taxonomy');
+    $this->mailhandler_user = $this->drupalCreateUser($permissions);
+    user_save($this->mailhandler_user, array('mail' => 'from@example.com'));
+    $this->drupalLogin($this->mailhandler_user);
+    // Multiple Email tests disabled until https://drupal.org/node/1238180 is fixed.
+    // $edit = array('email' => 'second@example.com');
+    // $this->drupalPost('user/' . $this->mailhandler_user->uid . '/edit/email-addresses', $edit, t('Save'));
+    $src = drupal_get_path('module', 'mailhandler') . '/tests/mbox/';
+    $dest = file_directory_temp() . '/mailhandler_test';
+    shell_exec("cp -r $src $dest");
+  }
+
+  public function createMailbox($prefix) {
+    $edit = array();
+    $edit['admin_title'] = $prefix . '@example.com';
+    $edit['mail'] = $prefix . '_example_com';
+    $edit['settings[type]'] = 'local';
+    $edit['settings[folder]'] = file_directory_temp() . '/mailhandler_test/' . $prefix;
+    $edit['settings[flag_after_read]'] = FALSE;
+    $this->drupalPost(MAILHANDLER_MENU_PREFIX . '/mailhandler/add', $edit, t('Save'));
+    $this->assertText(t('@title has been created.', array('@title' => $prefix . '_example_com')));
+  }
+
+  public function createMailboxes() {
+    $dir = file_directory_temp() . '/mailhandler_test';
+    $files = scandir($dir);
+    $files = array_diff($files, array('..', '.'));
+    foreach ($files as $mailbox) {
+      $this->createMailbox($mailbox);
+    }
+  }
+
+  public function createSource($prefix, $count = 0, $auth_required = FALSE) {
+    $edit = array();
+    $edit['feeds[MailhandlerFetcher][source]'] = $prefix . '_example_com';
+    $edit['feeds[MailhandlerParser][auth_required]'] = $auth_required;
+    $edit['title'] = $prefix . '@example.com';
+    $this->drupalPost('node/add/mailhandler-source', $edit, t('Save'));
+    $text = 'There is no new content.';
+    if ($count == 1) {
+      $text = 'Created ' . $count . ' Story node.';
+    }
+    elseif ($count > 1) {
+      $text = 'Created ' . $count . ' Story nodes.';
+    }
+    $this->assertText(t($text));
+  }
+
+  public function drupalGetNodeByTitle($title) {
+    return node_load(array('title' => $title));
+  }
+
+  public function createMapping($source, $target) {
+    $edit = array();
+    $edit['source'] = $source;
+    $edit['target'] = $target;
+    $this->drupalPost(MAILHANDLER_MENU_PREFIX . '/feeds/edit/mailhandler_nodes/mapping', $edit, t('Add'));
+  }
+
+  public function testMailhandlerImport() {
+    // Create mailboxes.
+    $this->createMailboxes();
+
+    // Add tags vocabulary.
+    $edit = array();
+    $edit['name'] = 'tags';
+    $edit['nodes[story]'] = TRUE;
+    $edit['tags'] = TRUE;
+    $this->drupalPost('admin/content/taxonomy/add/vocabulary', $edit, t('Save'));
+
+    // Add field_files to story.
+    $field = array(
+      'field_name' => 'field_files',
+      'type_name' => 'story',
+      'widget_active' => '1',
+      'type' => 'filefield',
+      'required' => '0',
+      'multiple' => '0',
+      'db_storage' => '1',
+      'module' => 'filefield',
+      'active' => '1',
+      'locked' => '0',
+      'columns' => array(
+        'fid' => array(
+          'type' => 'int',
+          'not null' => FALSE,
+          'views' => TRUE,
+          ),
+        'list' => array(
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => FALSE,
+          'views' => TRUE,
+          ),
+        'data' => array(
+          'type' => 'text',
+          'serialize' => TRUE,
+          'views' => TRUE,
+          ),
+        ),
+      'list_field' => '0',
+      'list_default' => 1,
+      'description_field' => '0',
+      'widget' => array(
+        'file_extensions' => 'txt',
+        'file_path' => '',
+        'progress_indicator' => 'bar',
+        'max_filesize_per_file' => '',
+        'max_filesize_per_node' => '',
+        'label' => 'Files',
+        'weight' => '31',
+        'description' => '',
+        'type' => 'filefield_widget',
+        'module' => 'filefield',
+        ),
+      );
+    module_load_include('inc', 'content', 'includes/content.crud');
+    content_field_instance_create($field);
+
+    // Add from fields to story.
+    $fields = array('field_from_address', 'field_from_name', 'field_text_test');
+    foreach ($fields as $field_name) {
+      $field = array(
+        'field_name' => $field_name,
+        'type_name' => 'story',
+        'widget_active' => '1',
+        'type' => 'text',
+        'required' => '0',
+        'multiple' => '0',
+        'db_storage' => '1',
+        'module' => 'text',
+        'active' => '1',
+        'locked' => '0',
+        'columns' => array(
+          'value' => array(
+            'type' => 'text',
+            'size' => 'big',
+            'not null' => FALSE,
+            'sortable' => TRUE,
+            'views' => TRUE,
+          ),
+        ),
+        'text_processing' => '0',
+        'max_length' => '',
+        'allowed_values' => '',
+        'allowed_values_php' => '',
+        'widget' => array(
+          'rows' => 5,
+          'size' => '60',
+          'default_value' => array(
+            0 => array(
+              'value' => '',
+              '_error_element' => 'default_value_widget][field_text][0][value',
+            ),
+          ),
+          'default_value_php' => NULL,
+          'label' => 'Text',
+          'weight' => '32',
+          'description' => '',
+          'type' => 'text_textfield',
+          'module' => 'text',
+        ),
+      );
+      module_load_include('inc', 'content', 'includes/content.crud');
+      content_field_instance_create($field);
+    }
+
+    // Override Mailhandler Default importer, map taxonomy, files, and text fields.
+    $this->drupalGet(MAILHANDLER_MENU_PREFIX . '/feeds/edit/mailhandler_nodes/settings/MailhandlerParser');
+    $edit = array();
+    $edit['available_commands'] = 'status' . "\n" . 'taxonomy' . "\n" . 'Nachname';
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->createMapping('taxonomy', 'taxonomy:1');
+    $this->createMapping('attachments', 'field_files');
+    $this->createMapping('from-address', 'field_from_address');
+    $this->createMapping('from-name', 'field_from_name');
+    $this->createMapping('Nachname', 'field_text_test');
+
+    // Test import of an empty mailbox.
+    $this->createSource('empty');
+
+    // Test import of message - auth user, auth required.
+    $this->createSource('test1', 1, TRUE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('This is a test message 1'));
+    $this->assertTrue($node->status);
+    $this->assertEqual($node->taxonomy[1]->name, 'term1');
+    $this->assertEqual($node->taxonomy[2]->name, 'term2');
+    // Test that from-address and from-name headers work.
+    $this->assertEqual($node->field_from_address[0]['value'], 'from@example.com');
+    $this->assertEqual($node->field_from_name[0]['value'], 'Dane Powell');
+    $edit = array();
+    $this->drupalPost('node/' . $node->nid . '/delete', $edit, t('Delete'));
+
+    // Test import of message - auth user, auth not required.
+    $this->createSource('test1', 1, FALSE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('This is a test message 1'));
+    $this->assertTrue($node->status);
+    $this->assertEqual($node->taxonomy[1]->name, 'term1');
+    $this->assertEqual($node->taxonomy[2]->name, 'term2');
+
+    // Test import of message - anon user, auth required.
+    $this->createSource('test2', 0, TRUE);
+    $this->assertFalse($node = $this->drupalGetNodeByTitle('This is a test message 2'));
+
+    // Test import of message - anon user, auth not required.
+    $this->createSource('test2', 1, FALSE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('This is a test message 2'));
+    $this->assertFalse($node->status);
+    // Test that taxonomy and commands with special characters work.
+    $this->assertEqual($node->taxonomy[1]->name, 'term1');
+    $this->assertEqual($node->taxonomy[2]->name, 'term2');
+    $this->assertEqual($node->taxonomy[3]->name, 'term/slash');
+    $this->assertEqual($node->taxonomy[4]->name, 'term:colon');
+
+    // Test import of multiple messages.
+    $this->createSource('test3', 2);
+    $this->assertTrue($this->drupalGetNodeByTitle('Test message 1 of 2'));
+    $this->assertTrue($this->drupalGetNodeByTitle('Test message 2 of 2'));
+
+    // Test import of messages with attachments.
+    $this->createSource('attachment1', 1);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('Test attachments 1'));
+    $this->assertTrue(isset($node->field_files[0]));
+    $this->assertEqual($node->field_files[0]['filesize'], 778);
+
+    // Test import of single-part messages.
+    $this->createSource('singlepart', 1);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('This is a single-part message'));
+    $this->assertTrue(isset($node->field_files[0]));
+
+    // Test import of messages with MIME-encoded headers.
+    $this->createSource('mime', 1);
+    $this->assertTrue($this->drupalGetNodeByTitle('mime header'));
+
+    // Test import of messages in ISO-8859 encoding
+    $this->createSource('test5', 1, FALSE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('Deutscher Verband für Meeresmüll'));
+
+    // Test import of binary content.
+    $this->createSource('inline', 1);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('Test inline image'));
+    $files = $node->field_files;
+    $filename_actual = $files[0]['filepath'];
+    $handle_actual = fopen($filename_actual, 'r');
+    $filestring_actual = fread($handle_actual, filesize($filename_actual));
+    $filename_expected = drupal_get_path('module', 'mailhandler') . '/tests/druplicon.png';
+    $handle_expected = fopen($filename_expected, 'r');
+    $filestring_expected = fread($handle_expected, filesize($filename_expected));
+    $this->assertTrue($filestring_expected === $filestring_actual);
+
+    // Test that capitalized commands work
+    $this->createSource('capital_commands', 1, FALSE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('Test capital commands'));
+    $this->assertEqual($node->field_text_test[0]['value'], 'testing');
+  }
+
+}

@@ -1,0 +1,38 @@
+<?php
+// $Id$
+/**
+* @file Installation
+*/
+function formdefaults_install() {
+  db_update('system')
+    -> fields(
+       array(
+         'weight' => 20,
+    ))
+    ->condition('name', 'formdefaults', '=')
+    ->execute();
+}
+
+/**
+ * Implementation of hook_schema
+ *
+ * @return array Schema definition array.
+ */
+function formdefaults_schema() {
+  $schema['formdefaults_forms'] = array(
+    'fields' => array(
+    'formid' => array('type' => 'varchar', 'length' => 255),
+      'formdata' => array('type' => 'text')
+      ),
+    'primary key' => array('formid'),
+    );
+  return $schema;
+}
+
+function formdefaults_update_7000() {
+  require_once 'formdefaults.admin.inc';
+  $form_list = _formdefaults_search('');
+  foreach ($form_list as $key => $formdata) {
+    _formdefaults_save_form($key, $formdata);
+  }
+}

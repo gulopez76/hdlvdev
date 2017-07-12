@@ -1,0 +1,2 @@
+- This module MUST have a larger weight than the VAT or GST module
+- This module provides an alternative cart block and cart checkout pane. These must be enabled and the originals disabled.

@@ -1,0 +1,14 @@
+name = Mailhandler Extended Headers
+description = Allows arbitrary headers to be mapped in Mailhandler.
+core = 6.x
+dependencies[] = "mailhandler"
+package = "Mailhandler extras"
+
+files[] = plugins/mailhandler/commands/MailhandlerCommandsExtendedHeaders.class.php
+
+; Information added by Drupal.org packaging script on 2014-06-10
+version = "6.x-2.10"
+core = "6.x"
+project = "mailhandler"
+datestamp = "1402414129"
+

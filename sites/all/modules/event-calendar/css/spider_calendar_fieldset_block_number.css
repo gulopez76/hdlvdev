@@ -1,0 +1,16 @@
+#edit-block-number-wrapper,
+#edit-search-cal-title-wrapper,
+#edit-search-event-title-wrapper {
+  display: inline;
+}
+
+#edit-save-block-number,
+#edit-search-cal-button ,
+#edit-search-event-date-button {
+  margin-left: 10px;
+  position: relative;
+}
+
+#spider_calendar_manage_event_cancle {
+  float: right;
+}

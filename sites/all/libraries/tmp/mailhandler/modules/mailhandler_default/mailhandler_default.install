@@ -1,0 +1,12 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for Mailhandler Quick-start.
+ */
+
+/**
+ * Implementation of hook_enable().
+ */
+function mailhandler_default_enable() {
+  cache_clear_all('*', 'cache', TRUE);
+}

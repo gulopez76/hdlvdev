@@ -1,0 +1,6 @@
+; $Id$
+name = Decimal Quanities
+description = Allows decimal quantities for Ubercart orders. For example to purchase 3.14 metres of fabric.
+dependencies[] = uc_cart
+package = "Ubercart - extra"
+core = 6.x

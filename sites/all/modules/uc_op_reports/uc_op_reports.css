@@ -1,0 +1,28 @@
+/* $Id */
+
+#uc-op-reports-filter-form .form-submit {
+  margin-right: 1em;
+}
+
+.op-report th {
+  white-space: nowrap;
+}
+
+.op-report tr {
+  vertical-align: top;
+}
+
+.op-report td.order-id,
+.op-report td.qty {
+  text-align: center;
+}
+
+.op-report .grand-total {
+  text-align: right;
+  padding-right: 2em;
+}
+
+.op-report .grand-total-label {
+  font-weight: bold;
+}
+

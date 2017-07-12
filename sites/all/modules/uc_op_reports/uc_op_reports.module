@@ -1,0 +1,626 @@
+<?php
+
+$gulyear= 1898;
+
+/**
+ * Implementation of hook_menu().
+ */
+function uc_op_reports_menu() {
+  $items = array();
+
+  $items['user/%/ordered-products'] = array(
+    'title' => 'Ordered products',
+    'description' => 'List of products you have ordered.',
+    'page callback' => 'uc_op_reports_list',
+    'page arguments' => array('customer', 1),
+    'access callback' => 'uc_op_reports_user_tab_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    
+  );
+  $items['admin/store/reports/ordered-products'] = array(
+    'title' => 'Ordered products',
+    'description' => 'View a customizable report of products ordered on your site.',
+    'page callback' => 'uc_op_reports_list',
+    'page arguments' => array('admin'),
+    'access arguments' => array('view ordered products admin report'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/store/settings/reports/ordered-products'] = array(
+    'title' => 'Ordered products',
+    'description' => 'Configure the Ordered Products report settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uc_op_reports_settings_form'),
+    'access arguments' => array('admin ordered products reports'),
+    'file' => 'uc_op_reports.admin.inc',
+  );
+  $items['admin/store/reports/ordered-products/csv'] = array(
+    'title' => 'Ordered products',
+    'description' => 'Download a CSV version of the currently displayed report.',
+    'page callback' => 'uc_op_reports_download_csv',
+    'page arguments' => array('admin'),
+    'access arguments' => array('view ordered products admin report'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  return $items;
+}
+
+
+
+function uc_op_reports_filter_form_alter(&$form, &$form_state, $form_id) {
+   //drupal_set_message($form_state['values']['year']);
+}
+
+
+
+/*
+ * Access for user profile tab
+ * */
+
+function uc_op_reports_user_tab_access($uid) {
+  global $user;
+
+  // Always grant access to users with global view permission.
+  if (user_access('view any ordered products report')) {
+    return TRUE;
+  }
+
+  // Grant users access to their own report.
+  if ($user->uid == $uid && user_access('view own ordered products report')) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_permission().
+  */
+  
+function uc_op_reports_permission() {
+  return array(
+    'admin ordered products reports' => array(
+      'title' => t('admin ordered products reports'),
+      'description' => t('Administer ordered products reports'),
+    ),
+    'view ordered products admin report' => array(
+      'title' => t('view ordered products admin report'),
+      'description' => t('View ordered products admin report'),
+    ),
+    'view any ordered products report' => array(
+      'title' => t('view any ordered products report'),
+      'description' => t('View any ordered products report'),
+    ),
+    'view own ordered products report' => array(
+      'title' => t('view own ordered products report'),
+      'description' => t('View own ordered products report'),
+    ),
+  );
+ }
+  
+ /**
+ * Implementation of hook_theme().
+  */
+  
+ function uc_op_reports_theme() {
+   return array(
+     'uc_op_reports_fields' => array(
+      'render element' => 'form',
+     ),
+   );
+ }
+
+ 
+
+/*
+ *   Return the title options for the user profile tab or a specific one.
+ */
+function uc_op_reports_user_tab_titles($title = NULL) {
+  $titles = array(
+    'ordered_products' => t('Ordered products'),
+    'order_history' => t('Order history'),
+    'purchases' => t('Purchases'),
+    'product_history' => t('Product history'),
+    'donations' => t('Donations'),
+    'giving' => t('Giving statement'),
+  );
+
+  if (empty($title)) {
+    return $titles;
+  }
+  elseif (empty($titles[$title])) {
+    return t('Ordered products');
+  }
+  else {
+    return $titles[$title];
+  }
+}
+
+/*
+ * Return an array of fields available to ordered products reports.
+ * */ 
+function uc_op_reports_fields() {
+  return array(
+    'order_date' => array(
+      'title' => t('Order date'),
+      'label' => t('Date'),
+      'weight' => 0,
+      'customer' => TRUE,
+      'admin' => TRUE,
+      'field' => 'created',
+      'sort' => 'desc',
+    ),
+    'order_id' => array(
+      'title' => t('Order ID'),
+      'label' => t('Order'),
+      'weight' => 1,
+      'customer' => TRUE,
+      'admin' => TRUE,
+      'field' => 'order_id',
+
+    ),
+    'billing_name' => array(
+      'title' => t('Order billing name'),
+      'label' => t('Customer'),
+      'weight' => 2,
+      'customer' => FALSE,
+      'admin' => FALSE,
+      'field' => 'billing_last_name',
+    ),
+    'product_title' => array(
+      'title' => t('Product title'),
+      'label' => t('Product'),
+      'weight' => 3,
+      'customer' => TRUE,
+      'admin' => TRUE,
+      'field' => 'title',
+    ),
+    'product_description' => array(
+      'title' => t('Product title with attributes'),
+      'label' => t('Product'),
+      'weight' => 3,
+      'customer' => FALSE,
+      'admin' => FALSE,
+      'field' => 'title',
+    ),
+    'product_sku' => array(
+      'title' => t('Product SKU'),
+      'label' => t('SKU'),
+      'weight' => 4,
+      'customer' => FALSE,
+      'admin' => FALSE,
+      'field' => 'model',
+    ),
+    'qty' => array(
+      'title' => t('Quantity ordered'),
+      'label' => t('Qty.'),
+      'weight' => 5,
+      'customer' => TRUE,
+      'admin' => TRUE,
+      'field' => 'qty',
+    ),
+    'sell_price' => array(
+      'title' => t('Product price'),
+      'label' => t('Price'),
+      'weight' => 6,
+      'customer' => TRUE,
+      'admin' => TRUE,
+      'field' => 'price',
+    ),
+    'total' => array(
+      'title' => t('Product total'),
+      'label' => t('Total'),
+      'weight' => 7,
+      'customer' => TRUE,
+      'admin' => TRUE,
+      'field' => 'total',
+    ),
+  );
+}
+
+/*
+ * Listing users ordered products
+ */
+
+function uc_op_reports_list($display = 'admin', $uid = NULL, $csv = FALSE) {
+  $header = array();
+  $rows = array();
+  $fields = array();
+  $grand_total = 0;
+
+  static $fuck;
+  global $any;
+
+  // Loop through all the available ordered products reports fields.
+  foreach (uc_op_reports_fields() as $key => $value) {
+    // If the field is enabled...
+    if (variable_get('uc_opr_field_' . $key . '_' . $display, $value[$display])) {
+      // Add it to the header and the query fields.
+      $cell = array(
+        'data' => $value['label'],
+        'weight' => variable_get('uc_opr_field_' . $key . '_weight', $value[$display]),
+      );
+      if (!empty($value['field'])) {
+        $cell['field'] = $value['field'];
+      }
+
+      if (!empty($value['sort'])) {
+        $cell['sort'] = $value['sort'];
+      }
+
+      $header[] = $cell;
+
+      $fields[] = array(
+        'field' => $key,
+        'weight' => variable_get('uc_opr_field_' . $key . '_weight', $value[$display]),
+      );
+    }
+  }
+
+  // Get the node types of products to be included on the report.
+  $types = array_diff(array_values(variable_get('uc_op_reports_product_classes', array('product'))), array(0));
+  
+
+  // Determine extra conditions for the query based on the arguments.
+  $where = '1=1';
+  $args = array();
+
+  //drupal_set_message("GET: " . $_GET['year']);
+  //drupal_set_message("REQUEST: " . $_REQUEST['year']);
+  //drupal_set_message("POST: " . $_POST['year']);
+
+	$result = db_query("SELECT MIN(o.created)
+		      FROM {uc_orders} AS o
+		      LEFT JOIN {uc_order_products} AS op ON o.order_id = op.order_id
+	      LEFT JOIN {node} AS n ON op.nid = n.nid
+	      WHERE n.type IN(:ntypes) AND ($where)", array_merge($args, array(':ntypes' => $types)))->fetchField();
+	$first_year = intval(date('Y', $result));
+   
+
+  if (!empty($_POST['year'])) {
+
+  // gul76 -  Insert new value in tb uc_vars varname filterorderreport
+  $tmpval = $_POST['year'];
+  $r2 = db_update('uc_vars')
+  ->fields(array(
+	'varvalue' => $tmpval,
+  ))
+  ->condition('varname', 'filterorderreport', '=') 
+  ->execute();
+  //drupal_set_message("Varname filterorderreport value equal to " . $r2);
+    $where .= ' AND o.created >= :created_start AND o.created < :created_end';
+    	$args[':created_start'] = gmmktime(0, 0, 0, 1, 1, intval($_POST['year']));
+    	$args[':created_end'] = gmmktime(0, 0, 0, 1, 1, intval($_POST['year']) + 1);
+  } elseif (empty($_POST['year']))
+  {
+  	// gul76 - Check if varvalue for varname file is different to 1898
+  	$r2 = db_query("SELECT varvalue FROM {uc_vars} where varname = 'filterorderreport'")->fetchField();	
+  	//drupal_set_message("Varname filterorderreport value equal to " . $r2 . " when POST is null");
+        if ($r2 <> '1898') {
+	    $where .= ' AND o.created >= :created_start AND o.created < :created_end';
+		$args[':created_start'] = gmmktime(0, 0, 0, 1, 1, intval($r2));
+		$args[':created_end'] = gmmktime(0, 0, 0, 1, 1, intval($r2) + 1);
+	}
+	  $r3 = db_update('uc_vars')
+	  ->fields(array(
+		'varvalue' => "1898",
+	  ))
+	  ->condition('varname', 'filterorderreport', '=') 
+	  ->execute();
+  } 
+
+  if (!empty($uid)) {
+    $where .= ' AND o.uid = :uid';
+    $args[':uid'] = $uid;
+  }
+
+  // Determine the first year for use in the filter form.
+
+/**
+  if ( (intval(date('Y', $result))) <> $first_year) { 
+  	$first_year = intval(date('Y', $result));
+  }
+**/ 
+
+
+
+  $query = db_select('uc_orders', 'o')->extend('TableSort');
+  $query->leftJoin('uc_order_products', 'op', 'o.order_id = op.order_id');
+  $query->leftJoin('node', 'n', 'op.nid = n.nid');
+  $query
+    ->fields('o', array('created', 'order_id', 'billing_first_name', 'billing_last_name'))
+    ->fields('op', array('nid', 'title', 'data', 'model', 'qty', 'price'))
+    ->fields('n', array('type'));
+  $query->addExpression('op.qty * op.price', 'total');
+  $query
+    ->condition('n.type', $types, 'IN')
+    ->condition('o.order_status', uc_order_status_list('general', TRUE), 'IN')
+    ->where($where, $args)
+    ->orderByHeader($header);
+  
+ // Select all the ordered products from the database within range.
+ if ($csv || (!empty($_GET['one_page']) && $_GET['one_page'] == 1)) {
+   $results = $query->execute();
+  }
+  else {
+    $results = $query->extend('PagerDefault')->limit(variable_get('uc_reports_table_size', 30))->execute();
+  }
+
+  // Loop through all the products and add them to the report.
+  foreach ($results as $result) {
+    $row = array();
+
+    foreach ($fields as $key => $value) {
+      switch ($value['field']) {
+        case 'order_date':
+          $row[] = date(variable_get('uc_date_format_default', 'm/d/Y'), $result->created);
+          break;
+
+        case 'order_id':
+          if ($csv) {
+            $row[] = $result->order_id;
+          }
+          else {
+            if ($display == 'admin') {
+              $path = 'admin/store/orders/' . $result->order_id;
+            }
+            elseif ($display == 'customer') {
+              $path = 'user/' . $uid . '/order/' . $result->order_id;
+            }
+
+            $row[] = array(
+              'data' => l($result->order_id, $path),
+              'class' => array('order-id'),
+            );
+          }
+          break;
+
+
+        case 'product_title':
+          if ($csv) {
+            $row[] = $result->title;
+          }
+          else {
+            $row[] = l($result->title, 'node/' . $result->nid);
+          }
+          break;
+
+        case 'product_description':
+           $product_data = unserialize($result->data);
+          $options = isset($product_data['attributes']) ? $product_data['attributes'] : array();
+          $option_rows = array();
+          if (module_exists('uc_attribute') && is_array($options)) {
+            foreach ($options as $attribute => $option) {
+              $option_rows[] = t('@attribute: @option', array('@attribute' => $attribute, '@option' => $option));
+            }
+          }
+
+          if ($csv) {
+            $row[] = implode(' | ', array_merge(array($result->title), $option_rows));
+          }
+          else {
+            $row[] = l($result->title, 'node/' . $result->nid) . theme('item_list', array('items' => $option_rows, 'title' => NULL, 'type' => 'ul', 'attributes' => array('class' => 'product-description')));
+          }
+          break;
+
+        case 'product_sku':
+          if ($csv) {
+            $row[] = $result->model;
+          }
+          else {
+            $row[] = check_plain($result->model);
+          }
+          break;
+
+        case 'qty':
+          if ($csv) {
+            $row[] = $result->qty;
+          }
+          else {
+            $row[] = array(
+              'data' => $result->qty,
+              array('class' => 'qty'),
+            );
+          }
+          break;
+
+        case 'sell_price':
+          $row[] = uc_currency_format($result->price);
+          break;
+
+        case 'total':
+          $row[] = uc_currency_format($result->total);
+          break;
+
+        default:
+          $row[] = '';
+          break;
+      }
+    }
+
+    // Keep track of the grand total of the rows listed on the report.
+    $grand_total += $result->total;
+
+    $rows[] = $row;
+  }
+
+  // Add an appropriate empty rows message or footer depending on the arguments.
+  if (empty($rows) && $csv) {
+    $rows[] = t('No ordered products found.');
+  }
+  elseif (empty($rows)) {
+    $rows[] = array(array(
+        'data' => t('No ordered products found.'),
+        'colspan' => count($header),
+      ));
+  }
+  elseif (!$csv) {
+    $rows[] = array(array(
+        'data' => '<span class="grand-total-label">' . t('Grand total: ') . '</span>' . uc_currency_format($grand_total),
+        'class' => array('grand-total'),
+        'colspan' => count($header),
+      ));
+  }
+
+  // Build the appropriate output based on the arguments.
+  if ($csv) {
+    $output = '';
+
+    // Add the header to the report.
+    foreach ($header as $cell) {
+      $output .= $cell['data'] . ',';
+    }
+    $output .= "\n";
+
+    // Add the rows to the report.
+    foreach ($rows as $row) {
+      $csv_row = array();
+
+      foreach ($row as $cell) {
+        $csv_row[] = str_replace(',', '', $cell);
+      }
+
+      $output .= implode(',', $csv_row) . "\n";
+    }
+  }
+  else {
+    $output = '';
+
+    drupal_add_css(drupal_get_path('module', 'uc_op_reports') . '/uc_op_reports.css');
+ 
+    // Add the CSV download link on the admin report.
+    if ($display == 'admin') {
+      // Build the query string for the CSV report.
+      $query = array();
+
+      foreach (array_diff_key($_GET, array('q' => '')) as $key => $value) {
+        $query[$key] = $value;
+      }
+
+      $output .= theme('item_list', array('items' => array(l(t('Download the entire current report as a CSV file.'), 'admin/store/reports/ordered-products/csv', array('query' => $query)))));
+    }
+
+    $form = drupal_get_form('uc_op_reports_filter_form', $display, $uid, $first_year, $any);
+    $output .= drupal_render($form);
+    $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('class' => array('op-report'))));
+    $output .= theme('pager');
+  }
+
+  //drupal_set_message("PreRender FuckYear Initial: " . $conf['fuckyear']);
+
+  return $output;
+}
+
+/*
+ * Form to filter the ordered products reports.
+ * */ 
+function uc_op_reports_filter_form($form, $form_state, $display, $uid = NULL, $first_year, $first_year2) {
+
+   
+
+ // //drupal_set_message("filter_form . Actual first_year var value : " . $first_year);
+
+  global $any;
+ // //drupal_set_message("filter_form . Global var any value : " . $any);
+
+  $form = array();
+
+  $form['display'] = array(
+    '#type' => 'value',
+    '#value' => $display,
+  );
+  $form['uid'] = array(
+    '#type' => 'value',
+    '#value' => $uid,
+  );
+
+  $form['op_reports_filter'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Adjust the report settings'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+  $form['op_reports_filter']['year'] = array(
+    '#type' => 'select',
+    '#title' => t('Filter by year'),
+    '#options' => drupal_map_assoc(array_merge(array(''), range($first_year, intval(date('Y'))))),
+    '#default_value' => !empty($_GET['year']) ? $_GET['year'] : '',
+  );
+  $form['op_reports_filter']['one_page'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display the entire report on one page.'),
+    '#default_value' => !empty($_GET['one_page']) ? $_GET['one_page'] : FALSE,
+  );
+  $form['op_reports_filter']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Update report'),
+    '#suffix' => l(t('Reset report'), $display == 'admin' ? 'admin/store/reports/ordered-products' : 'user/' . $uid . '/op-report'),
+  );
+
+  return $form;
+}
+
+function uc_op_reports_filter_form_submit($form, &$form_state) {
+  global $gulyear;
+  $gulyear = $form_state['values']['year'];
+  //drupal_set_message("Submit valor year:   " . $gulyear);
+
+  global $any;
+  $any = $form_state['values']['year']; 
+  //drupal_set_message("filter_form_submit . Global var any value : " . $any);
+
+  
+  //drupal_set_message("FuckYear Initial: " . $conf['fuckyear']);
+  $conf['fuckyear'] = $form_state['values']['year'];
+  //drupal_set_message("FuckYear Modified: " . $conf['fuckyear']);
+
+  $query = array();
+  //drupal_set_message("Submit valor:   " . $form_state['values']['submit']);
+
+  // Build the query string for the redirect based on form values.
+  if (!empty($form_state['values']['year'])) {
+    $query['year'] = $form_state['values']['year'];
+  }
+  if ($form_state['values']['one_page']) {
+    $query['one_page'] = 1;
+  }
+
+  // Determine the redirect path based on the display type.
+  if ($form_state['values']['display'] == 'admin') {
+    $path = 'admin/store/reports/ordered-products';
+  }
+  elseif ($form_state['values']['display'] == 'customer') {
+    $path = 'user/' . $form_state['values']['uid'] . '/op-report';
+  }
+
+}
+
+/*
+ * Output the CSV file of the current report for download.
+ * */ 
+function uc_op_reports_download_csv($display = 'admin', $uid = NULL) {
+  // Build the report's CSV output.
+  $output = uc_op_reports_list($display, $uid, TRUE);
+
+  ob_end_clean();
+
+  $http_headers = array(
+    'Pragma: no-cache',
+    'Expires: 0',
+    'Cache-Control: no-cache, must-revalidate',
+    'Cache-Control: private',
+    'Content-Transfer-Encoding: binary',
+    'Content-Length:'. strlen($output),
+    'Content-Disposition: attachment; filename="ordered-products.csv"',
+    'Content-Type: text/csv'
+  );
+
+  foreach ($http_headers as $header) {
+    $header = preg_replace('/\r?\n(?!\t| )/', '', $header);
+    drupal_add_http_header($header);
+  }
+
+  print $output;
+  exit();
+}

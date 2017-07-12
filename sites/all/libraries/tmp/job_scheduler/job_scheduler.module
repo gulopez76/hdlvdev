@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * job scheduler module.
+ */
+
+define('JOB_SCHEDULER_REQUEST_TIME', time());
+
+/**
+ * Implementation of hook_cron().
+ */
+function job_scheduler_cron() {
+  job_scheduler()->cron();
+}
+
+/**
+ * Return a JobScheduler object.
+ */
+function job_scheduler() {
+  // In case the Autoload module or similar is installed, this check will
+  // autoload the class file.
+  if (!class_exists('JobScheduler', TRUE)) {
+    // Otherwise we manually include the file.
+    module_load_include('inc', 'job_scheduler', 'JobScheduler');
+  }
+  return JobScheduler::instance();
+}

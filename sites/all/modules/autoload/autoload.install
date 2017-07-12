@@ -1,0 +1,14 @@
+<?php
+
+/**
+ * @file
+ * Installation and updating tasks.
+ */
+
+/**
+ * Implements hook_modules_enabled().
+ */
+function autoload_modules_enabled() {
+  drupal_static_reset('autoload_paths');
+  $_SESSION['autoload_paths'] = autoload_paths();
+}

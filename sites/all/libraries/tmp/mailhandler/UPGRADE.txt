@@ -1,0 +1,59 @@
+CONTENTS OF THIS FILE
+---------------------
+
+ * Overview
+ * Before upgrading
+ * After upgrading
+ * Known issues
+
+OVERVIEW
+--------
+
+This document provides instructions for upgrading from Mailhandler 6.x-1.x to
+6.x-2.x. For an overview of what's new in 6.x-2.x, please see the README file.
+The upgrade process is partially automated, but some manual intervention is
+still required, due to major architectural changes. The amount of work required
+will depend on the number and complexity of mailboxes that you are using. For
+most users, the whole upgrade process will take 5-15 minutes.
+
+BEFORE UPGRADING
+----------------
+
+Your existing mailboxes will be automatically converted to the new format;
+however, "default commands" will be discarded, since they are no longer
+associated with individual mailboxes. You should record the default commands
+for each mailbox, so that you can reconfigure them after the update process.
+
+AFTER UPGRADING
+---------------
+
+If you visit $base_url/admin/build/mailhandler, you should see each of your
+mailboxes has been converted to the new format. You can test the connection
+for each mailbox to ensure that Mailhandler can still connect to them.
+
+Then visit $base_url/admin/build/feeds. You will notice that a new importer
+has been created for each corresponding mailbox. In Mailhandler 6.x-2.x, the
+mailbox simply stores connection settings; the corresponding importer is what
+actually pulls in new nodes and comments. This means that you can actually
+have one importer importing messages from multiple mailboxes, or vice versa.
+
+You will need to edit each of these importers to restore the command
+configurations that were lost for each mailbox in the upgrade process. Click
+'edit' next to an importer, and then go to the parser settings. In the
+'available commands' field, add the command keys from your default commands and
+save the form. Then click on node processor mapping, and map the 'sources' that
+you just defined to node targets.
+
+For most users, at this point you should be back in business! Please read the
+INSTALL file for information on additional configuration options, and use the
+issue queue if you are still having problems.
+
+KNOWN ISSUES
+------------
+
+The update script will create a new input format for each combination of
+signature separator and input format that your mailboxes use. If you wish, you
+can instead add the signature separator filter to *existing* input format(s)
+and delete the new input format(s) that the update script created. You will
+want to edit each importer (as described above) to use the existing input
+format before deleting the duplicate format created by Mailhandler.

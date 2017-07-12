@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * Implementation of hook_install().
+ */
+function uc_decimal_quantities_install() {
+  db_query("UPDATE {system} SET weight = 3 WHERE name = 'uc_decimal_quantities'");
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function uc_decimal_quantities_uninstall() {
+  variable_del('uc_decimal_quantities_product_classes');
+}

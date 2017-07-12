@@ -1,0 +1,217 @@
+170712 13:37:48	  901 Connect	mypagesosagr@localhost on pagesos_hortadelaviola
+		  901 Query	SET NAMES utf8
+		  901 Query	SET sql_mode = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,STRICT_TRANS_TABLES,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER'
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_bootstrap WHERE cid IN ('variables')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_bootstrap WHERE cid IN ('bootstrap_modules')
+		  901 Query	SELECT 1 FROM blocked_ips WHERE ip = '127.0.0.1'
+		  901 Query	SELECT u.*, s.* FROM users u INNER JOIN sessions s ON u.uid = s.uid WHERE s.sid = '4IVUEQUcD_w-TBiD29_ZeVmkiycWQFKcYioYEt5MhJA'
+		  901 Query	SELECT r.rid, r.name FROM role r INNER JOIN users_roles ur ON ur.rid = r.rid WHERE ur.uid = '240'
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_bootstrap WHERE cid IN ('lookup_cache')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_bootstrap WHERE cid IN ('system_list')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_bootstrap WHERE cid IN ('module_implements')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache WHERE cid IN ('locale:ca')
+		  901 Query	SELECT source FROM url_alias WHERE alias = 'admin/store/reports/ordered-products' AND language IN ('ca', 'und') ORDER BY language ASC, pid DESC
+		  901 Query	SELECT rid, permission FROM role_permission WHERE rid IN ('2', '6')
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/store/reports/ordered-products', 'admin/store/reports/%', 'admin/store/%/ordered-products', 'admin/store/%/%', 'admin/%/reports/ordered-products', 'admin/%/reports/%', 'admin/store/reports', 'admin/store/%', 'admin/%/reports', 'admin/%/%', 'admin/store', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT dft.type, dft.title, dft.locked FROM date_format_type dft ORDER BY dft.title
+		  901 Query	SELECT format, type, language FROM date_format_locale
+		  901 Query	SELECT cache_update.cid AS cid, cache_update.data AS data, cache_update.created AS created, cache_update.expire AS expire, cache_update.serialized AS serialized
+FROM 
+cache_update cache_update
+WHERE  (cache_update.cid LIKE 'available_releases::%' ESCAPE '\\')
+		  901 Query	SELECT data, created, expire, serialized FROM cache_update WHERE cid = 'update_project_projects'
+		  901 Query	SELECT data, created, expire, serialized FROM cache_update WHERE cid = 'update_project_data'
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_path WHERE cid IN ('admin/store/reports/ordered-products')
+		  901 Query	SELECT source, alias FROM url_alias WHERE source IN ('node/127', 'node/504', 'node/227', 'node/510', 'node/711', 'node/670', 'node/194', 'node/109', 'node/104', 'node/102', 'node/106', 'node/101', 'node/168', 'node/93', 'node/652', 'node/426', 'node/33', 'node/513', 'node/89', 'node/493', 'node/16', 'node/400', 'node/499', 'node/173', 'node/317', 'node/432', 'node/52', 'node/48', 'node/6', 'node/672', 'node/118', 'node/108', 'node/54', 'node/110', 'node/162', 'node/267', 'node/88', 'node/293', 'node/151', 'node/296', 'node/508', 'node/145', 'user', 'user/logout', 'node/2', 'node/add', 'node/add/product') AND language IN ('ca', 'und') ORDER BY language ASC, pid ASC
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'See the <a href=\"@available_updates\">available updates</a> page for more information and to install your missing updates.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache WHERE cid IN ('theme_registry:runtime:garland')
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'There are security updates available for one or more of your modules or themes. To ensure the security of your server, you should update immediately!' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT DISTINCT registry.name AS name, registry.filename AS filename
+FROM 
+registry registry
+WHERE  (type='class' AND ( filename like '%.mail.%' OR name like '%MailSystem' ))
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_rules WHERE cid IN ('rules_event_whitelist')
+		  901 Query	SELECT MIN(o.created)
+                      FROM uc_orders AS o
+                      LEFT JOIN uc_order_products AS op ON o.order_id = op.order_id
+                      LEFT JOIN node AS n ON op.nid = n.nid
+                      WHERE n.type IN('product', 'pages_producte', 'xarxeta_producte', 'producte_cooperatives') AND (1=1)
+		  901 Query	SELECT * FROM uc_order_statuses WHERE state IN ('post_checkout', 'completed')
+		  901 Query	SELECT COUNT(*) AS expression
+FROM 
+(SELECT 1 AS expression
+FROM 
+uc_orders o
+LEFT OUTER JOIN uc_order_products op ON o.order_id = op.order_id
+LEFT OUTER JOIN node n ON op.nid = n.nid
+WHERE  (n.type IN  ('product', 'pages_producte', 'xarxeta_producte', 'producte_cooperatives')) AND (o.order_status IN  ('pending', 'per_pagar', 'pagat', 'processing', 'completed')) AND (1=1) ) subquery
+		  901 Query	SELECT o.created AS created, o.order_id AS order_id, o.billing_first_name AS billing_first_name, o.billing_last_name AS billing_last_name, op.nid AS nid, op.title AS title, op.data AS data, op.model AS model, op.qty AS qty, op.price AS price, n.type AS type, op.qty * op.price AS total
+FROM 
+uc_orders o
+LEFT OUTER JOIN uc_order_products op ON o.order_id = op.order_id
+LEFT OUTER JOIN node n ON op.nid = n.nid
+WHERE  (n.type IN  ('product', 'pages_producte', 'xarxeta_producte', 'producte_cooperatives')) AND (o.order_status IN  ('pending', 'per_pagar', 'pagat', 'processing', 'completed')) AND (1=1) 
+ORDER BY created DESC
+LIMIT 100 OFFSET 0
+		  901 Query	SELECT alias FROM url_alias WHERE source = 'node/711' AND language IN ('ca', 'und') ORDER BY language ASC, pid DESC
+		  901 Query	SELECT * FROM formdefaults_forms WHERE formid = 'uc_op_reports_filter_form'
+		  901 Query	SELECT b.*
+FROM 
+block b
+WHERE  (b.theme = 'garland') AND (b.status = '1') 
+ORDER BY b.region ASC, b.weight ASC, b.module ASC
+		  901 Query	SELECT module, delta, rid FROM block_role
+		  901 Query	SELECT module, delta, type FROM block_node_type
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache WHERE cid IN ('node_types:ca')
+		  901 Query	SELECT body, format FROM block_custom WHERE bid = '3'
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache WHERE cid IN ('filter_formats:ca')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_filter WHERE cid IN ('2::f0e61e0d9278de0676525f12e282575d71b112d7bf63215b51369a012e423efb')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('menu_custom')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:menu-altausuari:page:admin/store/reports/ordered-products:ca:1:0')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:menu-altausuari:tree-data:ca:9bd1605e2280833450478f9083b7f8714c2fa28f1012455e2744e5af1a13eec5')
+		  901 Query	SELECT n.nid AS nid
+FROM 
+node n
+WHERE  (n.status = '1') AND (n.nid IN  ('2'))
+		  901 Query	SELECT body, format FROM block_custom WHERE bid = '4'
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_filter WHERE cid IN ('2::86cb2ebfe6ed2f2d5a04b83297c974b28802e315a4716b188ec453a1fd56b8c2')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:navigation:page:admin/store/reports/ordered-products:ca:1:0')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:navigation:tree-data:ca:9bd1605e2280833450478f9083b7f8714c2fa28f1012455e2744e5af1a13eec5')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:management:page:admin/store/reports/ordered-products:ca:1:0')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:management:tree-data:ca:b84809089deec9c2542b6cf38aff5f8c74c89a81d76f0e33bb5529354ae95186')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:user-menu:page:admin/store/reports/ordered-products:ca:1:0')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:user-menu:tree-data:ca:9bd1605e2280833450478f9083b7f8714c2fa28f1012455e2744e5af1a13eec5')
+		  901 Query	SELECT t.*, h.parent AS parent
+FROM 
+taxonomy_term_data t
+INNER JOIN taxonomy_term_hierarchy h ON h.tid = t.tid
+WHERE  (t.vid = '3') 
+ORDER BY t.weight ASC, t.name ASC
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'Use <em>products</em> to represent items for sale on the website, including all the unique information that can be attributed to a specific model number.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT * FROM uc_product_classes
+		  901 Query	SELECT fc.*
+FROM 
+field_config fc
+WHERE  (fc.field_name = 'taxonomy_catalog') AND (fc.active = '1') AND (fc.storage_active = '1') AND (fc.deleted = '0')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_field WHERE cid IN ('field_info_types:ca')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_field WHERE cid IN ('field_info:field_map')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache WHERE cid IN ('entity_info:ca')
+		  901 Query	SELECT COUNT(*) AS expression
+FROM 
+(SELECT DISTINCT field_data_taxonomy_catalog0.entity_type AS entity_type, field_data_taxonomy_catalog0.entity_id AS entity_id, field_data_taxonomy_catalog0.revision_id AS revision_id, field_data_taxonomy_catalog0.bundle AS bundle, 1 AS expression
+FROM 
+field_data_taxonomy_catalog field_data_taxonomy_catalog0
+INNER JOIN node node ON node.nid = field_data_taxonomy_catalog0.entity_id
+WHERE  (field_data_taxonomy_catalog0.taxonomy_catalog_tid = '1') AND (field_data_taxonomy_catalog0.deleted = '0') AND (node.status = '1') AND (field_data_taxonomy_catalog0.entity_type = 'node') AND (field_data_taxonomy_catalog0.bundle IN  ('product', 'pages_producte', 'xarxeta_producte', 'producte_cooperatives', 'product_kit')) ) subquery
+		  901 Query	SELECT ml.*, m.*, ml.weight AS link_weight
+FROM 
+menu_links ml
+LEFT OUTER JOIN menu_router m ON m.path = ml.router_path
+WHERE  (ml.link_path IN  ('admin/store/reports/ordered-products'))
+		  901 Query	SELECT COUNT(*) AS expression
+FROM 
+(SELECT DISTINCT field_data_taxonomy_catalog0.entity_type AS entity_type, field_data_taxonomy_catalog0.entity_id AS entity_id, field_data_taxonomy_catalog0.revision_id AS revision_id, field_data_taxonomy_catalog0.bundle AS bundle, 1 AS expression
+FROM 
+field_data_taxonomy_catalog field_data_taxonomy_catalog0
+INNER JOIN node node ON node.nid = field_data_taxonomy_catalog0.entity_id
+WHERE  (field_data_taxonomy_catalog0.taxonomy_catalog_tid = '2') AND (field_data_taxonomy_catalog0.deleted = '0') AND (node.status = '1') AND (field_data_taxonomy_catalog0.entity_type = 'node') AND (field_data_taxonomy_catalog0.bundle IN  ('product', 'pages_producte', 'xarxeta_producte', 'producte_cooperatives', 'product_kit')) ) subquery
+		  901 Query	SELECT COUNT(*) AS expression
+FROM 
+(SELECT DISTINCT field_data_taxonomy_catalog0.entity_type AS entity_type, field_data_taxonomy_catalog0.entity_id AS entity_id, field_data_taxonomy_catalog0.revision_id AS revision_id, field_data_taxonomy_catalog0.bundle AS bundle, 1 AS expression
+FROM 
+field_data_taxonomy_catalog field_data_taxonomy_catalog0
+INNER JOIN node node ON node.nid = field_data_taxonomy_catalog0.entity_id
+WHERE  (field_data_taxonomy_catalog0.taxonomy_catalog_tid = '3') AND (field_data_taxonomy_catalog0.deleted = '0') AND (node.status = '1') AND (field_data_taxonomy_catalog0.entity_type = 'node') AND (field_data_taxonomy_catalog0.bundle IN  ('product', 'pages_producte', 'xarxeta_producte', 'producte_cooperatives', 'product_kit')) ) subquery
+		  901 Query	SELECT COUNT(*) AS expression
+FROM 
+(SELECT DISTINCT field_data_taxonomy_catalog0.entity_type AS entity_type, field_data_taxonomy_catalog0.entity_id AS entity_id, field_data_taxonomy_catalog0.revision_id AS revision_id, field_data_taxonomy_catalog0.bundle AS bundle, 1 AS expression
+FROM 
+field_data_taxonomy_catalog field_data_taxonomy_catalog0
+INNER JOIN node node ON node.nid = field_data_taxonomy_catalog0.entity_id
+WHERE  (field_data_taxonomy_catalog0.taxonomy_catalog_tid = '4') AND (field_data_taxonomy_catalog0.deleted = '0') AND (node.status = '1') AND (field_data_taxonomy_catalog0.entity_type = 'node') AND (field_data_taxonomy_catalog0.bundle IN  ('product', 'pages_producte', 'xarxeta_producte', 'producte_cooperatives', 'product_kit')) ) subquery
+		  901 Query	SELECT COUNT(*) AS expression
+FROM 
+(SELECT DISTINCT field_data_taxonomy_catalog0.entity_type AS entity_type, field_data_taxonomy_catalog0.entity_id AS entity_id, field_data_taxonomy_catalog0.revision_id AS revision_id, field_data_taxonomy_catalog0.bundle AS bundle, 1 AS expression
+FROM 
+field_data_taxonomy_catalog field_data_taxonomy_catalog0
+INNER JOIN node node ON node.nid = field_data_taxonomy_catalog0.entity_id
+WHERE  (field_data_taxonomy_catalog0.taxonomy_catalog_tid = '5') AND (field_data_taxonomy_catalog0.deleted = '0') AND (node.status = '1') AND (field_data_taxonomy_catalog0.entity_type = 'node') AND (field_data_taxonomy_catalog0.bundle IN  ('product', 'pages_producte', 'xarxeta_producte', 'producte_cooperatives', 'product_kit')) ) subquery
+		  901 Query	SELECT COUNT(*) AS expression
+FROM 
+(SELECT DISTINCT field_data_taxonomy_catalog0.entity_type AS entity_type, field_data_taxonomy_catalog0.entity_id AS entity_id, field_data_taxonomy_catalog0.revision_id AS revision_id, field_data_taxonomy_catalog0.bundle AS bundle, 1 AS expression
+FROM 
+field_data_taxonomy_catalog field_data_taxonomy_catalog0
+INNER JOIN node node ON node.nid = field_data_taxonomy_catalog0.entity_id
+WHERE  (field_data_taxonomy_catalog0.taxonomy_catalog_tid = '6') AND (field_data_taxonomy_catalog0.deleted = '0') AND (node.status = '1') AND (field_data_taxonomy_catalog0.entity_type = 'node') AND (field_data_taxonomy_catalog0.bundle IN  ('product', 'pages_producte', 'xarxeta_producte', 'producte_cooperatives', 'product_kit')) ) subquery
+		  901 Query	SELECT COUNT(*) AS expression
+FROM 
+(SELECT DISTINCT field_data_taxonomy_catalog0.entity_type AS entity_type, field_data_taxonomy_catalog0.entity_id AS entity_id, field_data_taxonomy_catalog0.revision_id AS revision_id, field_data_taxonomy_catalog0.bundle AS bundle, 1 AS expression
+FROM 
+field_data_taxonomy_catalog field_data_taxonomy_catalog0
+INNER JOIN node node ON node.nid = field_data_taxonomy_catalog0.entity_id
+WHERE  (field_data_taxonomy_catalog0.taxonomy_catalog_tid = '7') AND (field_data_taxonomy_catalog0.deleted = '0') AND (node.status = '1') AND (field_data_taxonomy_catalog0.entity_type = 'node') AND (field_data_taxonomy_catalog0.bundle IN  ('product', 'pages_producte', 'xarxeta_producte', 'producte_cooperatives', 'product_kit')) ) subquery
+		  901 Query	SELECT COUNT(*) AS expression
+FROM 
+(SELECT DISTINCT field_data_taxonomy_catalog0.entity_type AS entity_type, field_data_taxonomy_catalog0.entity_id AS entity_id, field_data_taxonomy_catalog0.revision_id AS revision_id, field_data_taxonomy_catalog0.bundle AS bundle, 1 AS expression
+FROM 
+field_data_taxonomy_catalog field_data_taxonomy_catalog0
+INNER JOIN node node ON node.nid = field_data_taxonomy_catalog0.entity_id
+WHERE  (field_data_taxonomy_catalog0.taxonomy_catalog_tid = '8') AND (field_data_taxonomy_catalog0.deleted = '0') AND (node.status = '1') AND (field_data_taxonomy_catalog0.entity_type = 'node') AND (field_data_taxonomy_catalog0.bundle IN  ('product', 'pages_producte', 'xarxeta_producte', 'producte_cooperatives', 'product_kit')) ) subquery
+		  901 Query	SELECT body, format FROM block_custom WHERE bid = '5'
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_filter WHERE cid IN ('2::8488fe39f2d2b7e8a57756e6684fd7b26bd5252ed4651ee714f4cf420baaa4e1')
+		  901 Query	SELECT body, format FROM block_custom WHERE bid = '2'
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_filter WHERE cid IN ('1::0064458c27522ed3bcdac1612d830d87b386d22458b4f5ea63363b629fd0047f')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:menu-adminlinks:page:admin/store/reports/ordered-products:ca:1:0')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:menu-adminlinks:tree-data:ca:57df43d0f4344923f0ba2553793654dce6fd0b46e4b549a6dd8ded08c0bf2c30')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:secondary-menu:page:admin/store/reports/ordered-products:ca:1:0')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:secondary-menu:tree-data:ca:9bd1605e2280833450478f9083b7f8714c2fa28f1012455e2744e5af1a13eec5')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('local_tasks:admin/store/reports/ordered-products')
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'Backup and Migrate makes the task of backing up your Drupal database and migrating data from one Drupal install to another easier. It provides a function to backup the entire database to file or download, and to restore from a previous backup. You can also schedule the backup operation. Compression of backup files is also supported.  The database backup files created with this module can be imported into this or any other Drupal installation with the !restorelink, or you can use a database tool such as <a href=\"!phpmyadminurl\">phpMyAdmin</a> or the mysql command line command.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'Use this form to run manual backups of your database and files with more advanced options. If you have any !profilelink saved you can load those settings. You can save any of the changes you make to these settings as a new settings profile.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'Upload a backup and migrate backup file. The restore function will not work with database dumps from other sources such as phpMyAdmin.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'Destinations are the places you can save your backup files to or them load from.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'Files can be saved to a directory on your web server, downloaded to your desktop or emailed to a specified email account. From the Destinations tab you can create, delete and edit destinations or list the files which have already been backed up to the available destinations.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'Sources are the things that can be backed up such as database or file directories.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'Profiles are saved backup settings. Profiles store your table exclusion settings as well as your backup file name, compression and timestamp settings. You can use profiles in !schedulelink and for !manuallink.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'You can create new profiles using the add profiles tab or by checking the \"Save these settings\" button on the advanced backup page.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'Automatically backup up your database and files on a regular schedule using <a href=\"!cronurl\">cron</a>.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'Each schedule will run a maximum of once per cron run, so they will not run more frequently than your cron is configured to run. If you specify a number of backups to keep for a schedule, old backups will be deleted as new ones created. <strong>If specifiy a number of files to keep other backup files in that schedule\'s destination will get deleted</strong>.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT s.lid, t.translation, s.version FROM locales_source s LEFT JOIN locales_target t ON s.lid = t.lid AND t.language = 'ca' WHERE s.source = 'Import a settings profile, backup schedule, source or destination by pasting the export code into the textarea.' AND s.context = '' AND s.textgroup = 'default'
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:main-menu:page:admin/store/reports/ordered-products:ca:1:1')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:main-menu:tree-data:ca:9ec01ec58bf82a695e4acd636af283e0585fe8cd8a6e54eb140188a3e284ab1c')
+		  901 Query	SELECT n.nid AS nid
+FROM 
+node n
+WHERE  (n.status = '1') AND (n.nid IN  ('1'))
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:user-menu:page:admin/store/reports/ordered-products:ca:1:1')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:user-menu:tree-data:ca:9ec01ec58bf82a695e4acd636af283e0585fe8cd8a6e54eb140188a3e284ab1c')
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/block/manage/block/3', 'admin/structure/block/manage/block/%', 'admin/structure/block/manage/%/3', 'admin/structure/block/manage/%/%', 'admin/structure/block/%/block/3', 'admin/structure/block/%/block/%', 'admin/%/block/manage/%/3', 'admin/%/block/manage/%/%', 'admin/structure/block/manage/block', 'admin/structure/block/manage/%', 'admin/structure/block/%/block', 'admin/structure/block/%/%', 'admin/structure/%/%/%', 'admin/%/block/manage/block', 'admin/%/block/manage/%', 'admin/%/block/%/block', 'admin/structure/block/manage', 'admin/structure/block/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/block/manage', 'admin/%/block/%', 'admin/structure/block', 'admin/structure/%', 'admin/%/block', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT m.*
+FROM 
+menu_router m
+WHERE  (tab_parent = 'admin/structure/block/manage/%/%') AND (context <> '0') AND (context <> '1') 
+ORDER BY weight ASC, title ASC
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/menu/manage/menu-altausuari', 'admin/structure/menu/manage/%', 'admin/structure/menu/%/menu-altausuari', 'admin/structure/menu/%/%', 'admin/structure/%/%/%', 'admin/%/menu/manage/menu-altausuari', 'admin/%/menu/manage/%', 'admin/%/menu/%/menu-altausuari', 'admin/structure/menu/manage', 'admin/structure/menu/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/menu/manage', 'admin/%/menu/%', 'admin/structure/menu', 'admin/structure/%', 'admin/%/menu', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT m.*
+FROM 
+menu_router m
+WHERE  (tab_parent = 'admin/structure/menu/manage/%') AND (context <> '0') AND (context <> '1') 
+ORDER BY weight ASC, title ASC
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/block/manage/menu/menu-altausuari', 'admin/structure/block/manage/menu/%', 'admin/structure/block/manage/%/menu-altausuari', 'admin/structure/block/manage/%/%', 'admin/structure/block/%/menu/menu-altausuari', 'admin/structure/block/%/menu/%', 'admin/%/block/manage/%/menu-altausuari', 'admin/%/block/manage/%/%', 'admin/structure/block/manage/menu', 'admin/structure/block/manage/%', 'admin/structure/block/%/menu', 'admin/structure/block/%/%', 'admin/structure/%/%/%', 'admin/%/block/manage/menu', 'admin/%/block/manage/%', 'admin/%/block/%/menu', 'admin/structure/block/manage', 'admin/structure/block/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/block/manage', 'admin/%/block/%', 'admin/structure/block', 'admin/structure/%', 'admin/%/block', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/block/manage/block/4', 'admin/structure/block/manage/block/%', 'admin/structure/block/manage/%/4', 'admin/structure/block/manage/%/%', 'admin/structure/block/%/block/4', 'admin/structure/block/%/block/%', 'admin/%/block/manage/%/4', 'admin/%/block/manage/%/%', 'admin/structure/block/manage/block', 'admin/structure/block/manage/%', 'admin/structure/block/%/block', 'admin/structure/block/%/%', 'admin/structure/%/%/%', 'admin/%/block/manage/block', 'admin/%/block/manage/%', 'admin/%/block/%/block', 'admin/structure/block/manage', 'admin/structure/block/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/block/manage', 'admin/%/block/%', 'admin/structure/block', 'admin/structure/%', 'admin/%/block', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/menu/manage/navigation', 'admin/structure/menu/manage/%', 'admin/structure/menu/%/navigation', 'admin/structure/menu/%/%', 'admin/structure/%/%/%', 'admin/%/menu/manage/navigation', 'admin/%/menu/manage/%', 'admin/%/menu/%/navigation', 'admin/structure/menu/manage', 'admin/structure/menu/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/menu/manage', 'admin/%/menu/%', 'admin/structure/menu', 'admin/structure/%', 'admin/%/menu', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/block/manage/system/navigation', 'admin/structure/block/manage/system/%', 'admin/structure/block/manage/%/navigation', 'admin/structure/block/manage/%/%', 'admin/structure/block/%/system/navigation', 'admin/structure/block/%/system/%', 'admin/%/block/manage/%/navigation', 'admin/%/block/manage/%/%', 'admin/structure/block/manage/system', 'admin/structure/block/manage/%', 'admin/structure/block/%/system', 'admin/structure/block/%/%', 'admin/structure/%/%/%', 'admin/%/block/manage/system', 'admin/%/block/manage/%', 'admin/%/block/%/system', 'admin/structure/block/manage', 'admin/structure/block/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/block/manage', 'admin/%/block/%', 'admin/structure/block', 'admin/structure/%', 'admin/%/block', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/menu/manage/management', 'admin/structure/menu/manage/%', 'admin/structure/menu/%/management', 'admin/structure/menu/%/%', 'admin/structure/%/%/%', 'admin/%/menu/manage/management', 'admin/%/menu/manage/%', 'admin/%/menu/%/management', 'admin/structure/menu/manage', 'admin/structure/menu/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/menu/manage', 'admin/%/menu/%', 'admin/structure/menu', 'admin/structure/%', 'admin/%/menu', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/block/manage/system/management', 'admin/structure/block/manage/system/%', 'admin/structure/block/manage/%/management', 'admin/structure/block/manage/%/%', 'admin/structure/block/%/system/management', 'admin/structure/block/%/system/%', 'admin/%/block/manage/%/management', 'admin/%/block/manage/%/%', 'admin/structure/block/manage/system', 'admin/structure/block/manage/%', 'admin/structure/block/%/system', 'admin/structure/block/%/%', 'admin/structure/%/%/%', 'admin/%/block/manage/system', 'admin/%/block/manage/%', 'admin/%/block/%/system', 'admin/structure/block/manage', 'admin/structure/block/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/block/manage', 'admin/%/block/%', 'admin/structure/block', 'admin/structure/%', 'admin/%/block', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/menu/manage/user-menu', 'admin/structure/menu/manage/%', 'admin/structure/menu/%/user-menu', 'admin/structure/menu/%/%', 'admin/structure/%/%/%', 'admin/%/menu/manage/user-menu', 'admin/%/menu/manage/%', 'admin/%/menu/%/user-menu', 'admin/structure/menu/manage', 'admin/structure/menu/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/menu/manage', 'admin/%/menu/%', 'admin/structure/menu', 'admin/structure/%', 'admin/%/menu', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/block/manage/system/user-menu', 'admin/structure/block/manage/system/%', 'admin/structure/block/manage/%/user-menu', 'admin/structure/block/manage/%/%', 'admin/structure/block/%/system/user-menu', 'admin/structure/block/%/system/%', 'admin/%/block/manage/%/user-menu', 'admin/%/block/manage/%/%', 'admin/structure/block/manage/system', 'admin/structure/block/manage/%', 'admin/structure/block/%/system', 'admin/structure/block/%/%', 'admin/structure/%/%/%', 'admin/%/block/manage/system', 'admin/%/block/manage/%', 'admin/%/block/%/system', 'admin/structure/block/manage', 'admin/structure/block/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/block/manage', 'admin/%/block/%', 'admin/structure/block', 'admin/structure/%', 'admin/%/block', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/block/manage/uc_catalog/catalog', 'admin/structure/block/manage/uc_catalog/%', 'admin/structure/block/manage/%/catalog', 'admin/structure/block/manage/%/%', 'admin/structure/block/%/uc_catalog/catalog', 'admin/structure/block/%/uc_catalog/%', 'admin/%/block/manage/%/catalog', 'admin/%/block/manage/%/%', 'admin/structure/block/manage/uc_catalog', 'admin/structure/block/manage/%', 'admin/structure/block/%/uc_catalog', 'admin/structure/block/%/%', 'admin/structure/%/%/%', 'admin/%/block/manage/uc_catalog', 'admin/%/block/manage/%', 'admin/%/block/%/uc_catalog', 'admin/structure/block/manage', 'admin/structure/block/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/block/manage', 'admin/%/block/%', 'admin/structure/block', 'admin/structure/%', 'admin/%/block', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/block/manage/block/5', 'admin/structure/block/manage/block/%', 'admin/structure/block/manage/%/5', 'admin/structure/block/manage/%/%', 'admin/structure/block/%/block/5', 'admin/structure/block/%/block/%', 'admin/%/block/manage/%/5', 'admin/%/block/manage/%/%', 'admin/structure/block/manage/block', 'admin/structure/block/manage/%', 'admin/structure/block/%/block', 'admin/structure/block/%/%', 'admin/structure/%/%/%', 'admin/%/block/manage/block', 'admin/%/block/manage/%', 'admin/%/block/%/block', 'admin/structure/block/manage', 'admin/structure/block/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/block/manage', 'admin/%/block/%', 'admin/structure/block', 'admin/structure/%', 'admin/%/block', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/block/manage/block/2', 'admin/structure/block/manage/block/%', 'admin/structure/block/manage/%/2', 'admin/structure/block/manage/%/%', 'admin/structure/block/%/block/2', 'admin/structure/block/%/block/%', 'admin/%/block/manage/%/2', 'admin/%/block/manage/%/%', 'admin/structure/block/manage/block', 'admin/structure/block/manage/%', 'admin/structure/block/%/block', 'admin/structure/block/%/%', 'admin/structure/%/%/%', 'admin/%/block/manage/block', 'admin/%/block/manage/%', 'admin/%/block/%/block', 'admin/structure/block/manage', 'admin/structure/block/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/block/manage', 'admin/%/block/%', 'admin/structure/block', 'admin/structure/%', 'admin/%/block', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/menu/manage/menu-adminlinks', 'admin/structure/menu/manage/%', 'admin/structure/menu/%/menu-adminlinks', 'admin/structure/menu/%/%', 'admin/structure/%/%/%', 'admin/%/menu/manage/menu-adminlinks', 'admin/%/menu/manage/%', 'admin/%/menu/%/menu-adminlinks', 'admin/structure/menu/manage', 'admin/structure/menu/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/menu/manage', 'admin/%/menu/%', 'admin/structure/menu', 'admin/structure/%', 'admin/%/menu', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_router WHERE path IN ('admin/structure/block/manage/menu/menu-adminlinks', 'admin/structure/block/manage/menu/%', 'admin/structure/block/manage/%/menu-adminlinks', 'admin/structure/block/manage/%/%', 'admin/structure/block/%/menu/menu-adminlinks', 'admin/structure/block/%/menu/%', 'admin/%/block/manage/%/menu-adminlinks', 'admin/%/block/manage/%/%', 'admin/structure/block/manage/menu', 'admin/structure/block/manage/%', 'admin/structure/block/%/menu', 'admin/structure/block/%/%', 'admin/structure/%/%/%', 'admin/%/block/manage/menu', 'admin/%/block/manage/%', 'admin/%/block/%/menu', 'admin/structure/block/manage', 'admin/structure/block/%', 'admin/structure/%/manage', 'admin/structure/%/%', 'admin/%/block/manage', 'admin/%/block/%', 'admin/structure/block', 'admin/structure/%', 'admin/%/block', 'admin/%/%', 'admin/structure', 'admin/%', 'admin') ORDER BY fit DESC LIMIT 0, 1
+		  901 Query	SELECT * FROM menu_links WHERE menu_name = 'management' AND module = 'system' AND link_path = 'admin'
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_menu WHERE cid IN ('links:management:tree-data:ca:27cbcc1096e9daf2c319c2c6c72d82e18debefade0868b49fd205edc315f6b58')
+		  901 Query	SELECT cid, data, created, expire, serialized FROM cache_bootstrap WHERE cid IN ('_drupal_file_scan_cache')
+		  901 Quit	

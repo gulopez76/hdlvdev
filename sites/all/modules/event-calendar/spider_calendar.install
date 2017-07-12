@@ -1,0 +1,1075 @@
+<?php
+/**
+ * @file
+ * Spider Calendar module install/schema hooks.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function spider_calendar_schema() {
+  $schema['spider_calendar_form_table'] = array(
+    'description' => 'The Spider Calendar nodes.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'vid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'type' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'calendar' => array(
+        'type' => 'int',
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+      'theme' => array(
+        'type' => 'int',
+        'length' => 11,
+        'not null' => TRUE,
+        'default' => '0',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['spider_calendar_block_number_table'] = array(
+    'description' => 'The Spider Calendar block number.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'block_number' => array(
+        'type' => 'int',
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['spider_calendar_calendar_table'] = array(
+    'description' => 'The table for Calendars.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 200,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'published' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+        'default' => '0',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['spider_calendar_events_table'] = array(
+    'description' => 'The table for Events.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'calendar' => array(
+        'type' => 'int',
+        'length' => 11,
+        'not null' => TRUE,
+        'default' => '0',
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_date' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_date_end' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_time' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'text' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'default' => '',
+      ),
+      'published' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+        'default' => '0',
+      ),
+      'repeat_method' => array(
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_repeat' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '0',
+      ),
+      'week' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'month' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'month_type' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'month_list' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'month_week' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'years_month' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['spider_calendar_theme_table'] = array(
+    'description' => 'The table for Themes.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'theme_width' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'week_start_day' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'border_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'border_radius' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'border_width' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'body_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_height' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'omd_fcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'omd_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_text_color_wevents' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_text_color_events' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_bgcolor_events' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_title_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cur_day_cell_border_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_border_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'sundays_tcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'sundays_cell_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'sundays_fcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'days_fsize' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'time_in_cell' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'header_heidht' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'header_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'year_font_size' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'year_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'year_arrow_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'month_type' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cur_month_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cur_month_fsize' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'month_arrow_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'next_month_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'next_month_fsize' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'next_month_arrow_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'prev_month_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'prev_month_fsize' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'prev_month_arrow_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'arrow_size' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'weekdays_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'week_cell_height' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'weekdays_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'sunday_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'weekdays_fsize' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'date_format_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_title_color_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_title_fsize_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_title_family_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_title_fstyle_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'date_color_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'date_fsize_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'date_family_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'date_fstyle_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'arrow_bgcolor_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'arrow_color_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'popup_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'popup_width' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'popup_height' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'displaied_events' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'repeat_rate' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'default_theme' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['spider_calendar_block_theme_table'] = array(
+    'description' => 'The table for Themes.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'theme_width' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'week_start_day' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'border_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'border_radius' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'border_width' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'show_titles_cloud' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'show_date_and_time_in_titlescloud' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'titles_cloud_text_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'body_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_height' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'omd_fcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'omd_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_text_color_wevents' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_text_color_events' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_text_color_selected_events' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_bgcolor_events' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_bgcolor_selected_events' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_title_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cur_day_cell_border_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'selected_day_cell_border_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cell_border_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'all_days_border' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'sundays_tcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'sundays_cell_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'sundays_fcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'days_fsize' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'time_in_cell' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'header_heidht' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'header_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'year_font_size' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'year_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'year_arrow_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'month_type' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cur_month_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cur_month_fsize' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'month_arrow_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'next_month_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'next_month_fsize' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'next_month_arrow_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'prev_month_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'prev_month_fsize' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'prev_month_arrow_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'arrow_size' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'weekdays_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'week_cell_height' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'weekdays_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'sunday_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'weekdays_fsize' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'date_format_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_title_color_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_title_fsize_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_title_family_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'event_title_fstyle_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'date_color_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'date_fsize_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'date_family_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'date_fstyle_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'arrow_bgcolor_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'arrow_color_popup' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'popup_bgcolor' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'popup_width' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'popup_height' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'displaied_events' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'repeat_rate' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'default_theme' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function spider_calendar_install() {
+  drupal_install_schema('spider_calendar');
+  db_query("INSERT INTO {spider_calendar_block_number_table} (block_number) VALUES(1)");
+  // Default themes.
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Black light','650','su','000000','8','2','323232','70','FFFFFF','282828','FFFFFF','000000','F0F0F0','000000','FFFFFF','000000','FFFFFF','323232','16','12','1','90','2A2829','33','FFFFFF','FFFFFF','1','FFFFFF','16','FFFFFF','FFFFFF','','FFFFFF','FFFFFF','','FFFFFF','12','FFFFFF','35','969696','969696','14','w/d/m/y','FFFFFF','','Arial','Normal','FFFFFF','','Arial','Normal','323232','C7C7C7','969696','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue Dark','650','su','000000','','2','5BCAFF','70','E6E6E6','C0C0C0','000000','FFFFFF','00004F','FFFFFF','FFFFFF','000000','000000','8ADAFF','18','14','1','120','00004F','40','D1D4F5','FFFFFF','1','D1D4F5','20','FFFFFF','FFFFFF','','FFFFFF','FFFFFF','','FFFFFF','14','FFFFFF','30','000000','000000','14','w/d/m/y','FFFFFF','','Arial','Normal','FFFFFF','','Arial','Normal','00004F','FFFFFF','009EEB','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue Elegant','650','su','346699','4','10','E3F9F9','70','FFFFFF','CCCCCC','2410EE','000000','FFCC33','000000','346699','6B6B6B','2410EE','CDDDFF','18','14','1','100','346699','33','FFFFFF','FFFFFF','1','FFFFFF','16','FFFFFF','FFFFFF','','FFFFFF','FFFFFF','','FFFFFF','12','FFFFFF','25','68676D','68676D','14','w/d/m/y','FFFFFF','','Arial','Normal','000000','','Arial','Normal','346699','E3B62D','FFCC33','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue Green Mix','650','su','ABCEA8','2','8','E3F9F9','70','B0B0B0','E1DDE9','383838','383838','C0EFC0','383838','58A42B','B1B1B0','FF7C5C','FFFFFF','16','12','1','40','C0EFC0','18','58A42B','58A42B','1','58A42B','18','58A42B','58A42B','16','58A42B','58A42B','16','58A42B','10','000000','25','FFFFFF','FFFFFF','12','w/d/m/y','FFFFFF','','Arial','Normal','262626','','Arial','Normal','58A42B','AED9AE','C0EFC0','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue Light','650','su','000000','0','4','FFFFFF','80','525252','FFFFFF','000000','FFFFFF','FFA142','FFFFFF','36A7E9','000000','36A7E9','FFFFFF','14','12','1','80','36A7E9','22','000000','000000','1','000000','14','000000','FFFFFF','','FFFFFF','FFFFFF','','FFFFFF','10','000000','40','FFFFFF','FFFFFF','14','w/d/m/y','FFFFFF','','Arial','Normal','FFFFFF','16','Arial','Bold','FFA142','FFFFFF','36A7E9','800','600','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue Simple','650','su','3DBCEB','6','12','FFFFFF','70','C7C7C7','FFFFFF','1374C3','000000','FCF7D9','000000','9A0000','1374C3','013A7D','FFFFFF','16','12','1','93','FCF7D9','33','9A0000','9A0000','1','9A0000','16','9A0000','FFFFFF','','FFFFFF','FFFFFF','','FFFFFF','10','FFFFFF','20','013A7D','1374C3','14','w/d/m/y','000000','','Arial','Normal','000000','','Arial','Bold','21B5FF','E0E0E0','FCF7D9','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Brown Elegant','650','su','FFC219','6','10','7E5F43','70','FFFFFF','523F30','FFFFFF','404040','FFC219','404040','FFFFFF','000000','FFFFFF','7E5F43','18','12','1','100','E7C892','30','404040','404040','1','404040','20','404040','404040','16','404040','404040','16','404040','12','404040','30','FFC219','FFC219','14','w/d/m/y','FFFFFF','','Arial','Normal','FFFFFF','','Arial','Normal','FFC219','B3875F','7E5F43','800','500','2','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Green Dark','650','su','D78B29','6','12','F0F0E6','70','A6A6A6','DDDCC8','5C5C5C','FFFFFF','D78B29','FFFFFF','000000','363636','000000','F0F0E6','16','12','1','100','598923','33','FFFFFF','FFFFFF','1','FFFFFF','16','FFFFFF','FFFFFF','','FFFFFF','FFFFFF','','FFFFFF','12','000000','30','D78B29','D78B29','14','w/d/m/y','FFFFFF','','Courier New','Bold','000000','','Arial','Normal','DDDCC8','D78B29','FFB061','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Green Elegant','650','su','FDFDCC','2','14','FDFDCC','70','8C8C8C','FDFDE8','383838','383838','FE7C00','FFFFFF','000000','4D4D4D','000000','BACBDC','16','12','1','90','009898','30','FFFFFF','FFFFFF','1','FFFFFF','16','FFFFFF','FFFFFF','','FFFFFF','FFFFFF','','FFFFFF','12','000000','30','9865FE','9865FE','14','w/d/m/y','FFFFFF','','Arial','Normal','FFFFFF','','Arial','Normal','FDFDE8','FEAC30v','FE7C00','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Green Light','650','su','000000','0','2','FDFCDE','70','6E5959','FFFFFF','060D12','000000','FF6933','000000','4AFF9E','000000','FF0000','FDFCDE','18','12','1','90','A6BA7D','28','000000','000000','1','080808','18','000000','FFFFFF','','FFFFFF','FFFFFF','','FFFFFF','18','000000','50','E6E6DE','BD848A','14','w/d/m/y','000000','18','Courier New','Normal','000000','16','Courier New','Bold','CCCCCC','E0E0C5','FDFCDE','800','600','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Red Elegant','650','mo','E6E6E4','6','18','CDCC96','70','525252','E4E7CC','000000','FFFFFF','9A0000','FFFFFF','9A0000','FFFFFF','000000','CDCC96','18','','1','100','9A0000','33','FFFFFF','FFFFFF','1','FFFFFF','16','FFFFFF','FFFFFF','','FFFFFF','FFFFFF','','FFFFFF','10','000000','60','FFFED0','FFFED0','14','w/d/m/y','000000','18','Arial','Normal','000000','','Arial','Normal','9A0000','DEDDB5','FFFED0','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_bgcolor_events,event_title_color,cur_day_cell_border_color,cell_border_color,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue','650','su','000000','0','4','FFFFFF','80','525252','FFFFFF','000000','FFFFFF','FFA142','FFFFFF','36A7E9','000000','36A7E9','FFFFFF','14','12','1','80','36A7E9','22','000000','000000','1','000000','14','000000','FFFFFF','','FFFFFF','FFFFFF','','FFFFFF','10','000000','40','FFFFFF','FFFFFF','14','w/d/m/y','FFFFFF','','Arial','Normal','FFFFFF','16','Arial','Bold','FFA142','FFFFFF','36A7E9','800','600','1','1','1')");
+
+  // Block default themes.
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Black light','175','su','000000','4','2','1','1','000000','363636','30','BDBDBD','363636','FFFFFF','000000','000000','F0F0F0','FFFFFF','000000','FFFFFF','000000','000000','0','FFFFFF','363636','14','12','0','30','2A2829','18','FFFFFF','FFFFFF','1','FFFFFF','14','FFFFFF','FFFFFF','9','FFFFFF','FFFFFF','9','FFFFFF','12','FFFFFF','25','2A2829','2A2829','14','w/d/m/y','000000','','Arial','Normal','000000','','Arial','Normal','323232','C7C7C7','969696','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue Dark','175','su','00004F','','2','1','1','000000','5BCAFF','30','E6E6E6','5BCAFF','000000','FFFFFF','FFFFFF','00004F','000000','FFFFFF','FFFFFF','FFFFFF','000000','0','000000','5BCAFF','14','12','0','40','00004F','18','D1D4F5','FFFFFF','2','D1D4F5','14','FFFFFF','FFFFFF','9','FFFFFF','FFFFFF','9','FFFFFF','14','FFFFFF','30','00004F','00004F','14','w/d/m/y','000000','','Arial','Normal','000000','','Arial','Normal','00004F','FFFFFF','009EEB','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue Elegant','175','su','346699','3','4','1','1','000000','E3F9F9','30','CCCCCC','E3F9F9','2410EE','000000','FFFFFF','FFCC33','346699','000000','346699','FFFFFF','6B6B6B','0','2410EE','E3F9F9','14','12','0','60','346699','18','FFFFFF','FFFFFF','2','FFFFFF','12','FFFFFF','FFFFFF','10','FFFFFF','FFFFFF','10','FFFFFF','8','FFFFFF','25','68676D','68676D','12','w/d/m/y','000000','','Arial','Normal','000000','','Arial','Normal','346699','E3B62D','FFCC33','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue Green Mix','175','su','ABCEA8','2','6','1','1','000000','E3F9F9','25','B0B0B0','E1DDE9','383838','383838','FFFFFF','C0EFC0','58A42B','383838','58A42B','FFFFFF','B1B1B0','0','FF7C5C','FFFFFF','12','14','0','70','C0EFC0','18','58A42B','58A42B','2','58A42B','12','58A42B','58A42B','10','58A42B','58A42B','10','58A42B','10','000000','20','FFFFFF','FFFFFF','12','w/d/m/y','000000','12','Arial','Normal','262626','12','Arial','Normal','58A42B','AED9AE','C0EFC0','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue Light','175','su','000000','0','2','1','1','000000','FFFFFF','25','525252','FFFFFF','000000','FFFFFF','FFFFFF','FFA142','36A7E9','FFFFFF','36A7E9','FFFFFF','000000','0','36A7E9','FFFFFF','14','12','0','70','36A7E9','18','000000','000000','2','000000','14','000000','FFFFFF','9','FFFFFF','FFFFFF','9','FFFFFF','10','000000','30','FFFFFF','FFFFFF','14','w/d/m/y','000000','12','Courier New','Normal','000000','16','Courier New','Bold','FFA142','FFFFFF','36A7E9','800','600','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue Simple','175','su','3DBCEB','3','5','1','1','000000','FFFFFF','25','C7C7C7','FFFFFF','1374C3','000000','FFFFFF','FCF7D9','9A0000','000000','9A0000','FFFFFF','1374C3','0','013A7D','FFFFFF','14','12','0','70','FCF7D9','18','9A0000','9A0000','2','9A0000','14','9A0000','FFFFFF','9','FFFFFF','FFFFFF','9','FFFFFF','9','FFFFFF','20','013A7D','1374C3','14','w/d/m/y','000000','','Arial','Normal','000000','','Arial','Bold','21B5FF','E0E0E0','FCF7D9','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Brown Elegant','175','su','FFC219','2','4','1','1','000000','7E5F43','25','FFFFFF','523F30','FFFFFF','404040','000000','FFC219','FFFFFF','404040','FFFFFF','000000','000000','0','FFFFFF','7E5F43','14','12','1','60','E7C892','16','404040','404040','1','404040','11','404040','404040','9','404040','404040','9','404040','10','404040','20','FFC219','FFC219','12','w/d/m/y','000000','','Arial','Normal','000000','','Arial','Normal','FFC219','B3875F','7E5F43','800','500','2','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Green Dark','175','su','D78B29','2','6','1','1','000000','F0F0E6','27','A6A6A6','DDDCC8','5C5C5C','FFFFFF','FFFFFF','D78B29','000000','FFFFFF','000000','FFFFFF','363636','1','000000','F0F0E6','14','12','0','70','598923','18','FFFFFF','FFFFFF','1','FFFFFF','14','FFFFFF','FFFFFF','9','FFFFFF','FFFFFF','9','FFFFFF','8','000000','25','D78B29','D78B29','12','w/d/m/y','000000','','Courier New','Bold','000000','','Arial','Normal','DDDCC8','D78B29','FFB061','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Green Elegant','175','su','FDFDCC','2','7','1','1','000000','FDFDCC','20','8C8C8C','FDFDE8','383838','383838','FFFFFF','FE7C00','000000','FFFFFF','000000','FFFFFF','4D4D4D','0','000000','BACBDC','14','12','0','40','009898','18','FFFFFF','FFFFFF','1','FFFFFF','14','FFFFFF','FFFFFF','9','FFFFFF','FFFFFF','9','FFFFFF','8','000000','25','9865FE','9865FE','14','w/d/m/y','000000','','Arial','Normal','000000','','Arial','Normal','FDFDE8','FEAC30v','FE7C00','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Green Light','175','su','000000','0','2','1','1','000000','FDFCDE','25','6E5959','FFFFFF','060D12','000000','FFFFFF','FF6933','4AFF9E','000000','4AFF9E','FFFFFF','000000','0','FF0000','FDFCDE','14','12','0','70','A6BA7D','16','000000','000000','2','080808','14','000000','FFFFFF','9','FFFFFF','FFFFFF','9','FFFFFF','14','000000','25','E6E6DE','BD848A','14','w/d/m/y','000000','18','Courier New','Normal','000000','16','Courier New','Bold','CCCCCC','E0E0C5','FDFCDE','800','600','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Red Elegant','175','su','D9D9D7','3','6','1','1','000000','CDCC96','27','525252','E4E7CC','000000','FFFFFF','000000','9A0000','FFFFFF','FFFFFF','9A0000','000000','FFFFFF','0','9A0000','CDCC96','14','','0','70','9A0000','18','FFFFFF','FFFFFF','2','FFFFFF','14','FFFFFF','FFFFFF','9','FFFFFF','FFFFFF','9','FFFFFF','9','000000','25','FFFED0','FFFED0','14','w/d/m/y','000000','','Arial','Normal','000000','','Arial','Normal','9A0000','DEDDB5','FFFED0','600','500','1','1','1')");
+
+  db_query("INSERT INTO {spider_calendar_block_theme_table} (title,theme_width,week_start_day,border_color,border_radius,border_width,show_titles_cloud,show_date_and_time_in_titlescloud,titles_cloud_text_color,body_bgcolor,cell_height,omd_fcolor,omd_bgcolor,cell_text_color_wevents,cell_text_color_events,cell_text_color_selected_events,cell_bgcolor_events,cell_bgcolor_selected_events,event_title_color,cur_day_cell_border_color,selected_day_cell_border_color,cell_border_color,all_days_border,sundays_tcolor,sundays_cell_bgcolor,sundays_fcolor,days_fsize,time_in_cell,header_heidht,header_bgcolor,year_font_size,year_color,year_arrow_color,month_type,cur_month_color,cur_month_fsize,month_arrow_color,next_month_color,next_month_fsize,next_month_arrow_color,prev_month_color,prev_month_fsize,prev_month_arrow_color,arrow_size,weekdays_color,week_cell_height,weekdays_bgcolor,sunday_bgcolor,weekdays_fsize,date_format_popup,event_title_color_popup,event_title_fsize_popup,event_title_family_popup,event_title_fstyle_popup,date_color_popup,date_fsize_popup,date_family_popup,date_fstyle_popup,arrow_bgcolor_popup,arrow_color_popup,popup_bgcolor,popup_width,popup_height,displaied_events,repeat_rate,default_theme)
+	 VALUES('Blue','175','su','000000','0','2','1','1','000000','FFFFFF','25','525252','FFFFFF','000000','FFFFFF','FFFFFF','FFA142','36A7E9','FFFFFF','36A7E9','FFFFFF','000000','0','36A7E9','FFFFFF','14','12','0','70','36A7E9','18','000000','000000','2','000000','14','000000','FFFFFF','9','FFFFFF','FFFFFF','9','FFFFFF','10','000000','30','FFFFFF','FFFFFF','14','w/d/m/y','000000','12','Courier New','Normal','000000','16','Courier New','Bold','FFA142','FFFFFF','36A7E9','800','600','1','1','1')");
+}
+
+/**
+ * Implements hook_disable().
+ */
+function spider_calendar_disable() {
+  // Delete Spider FC node coments.
+  if (module_exists('comment')) {
+    $spider_calendar_nodes_col = db_query(db_rewrite_sql("SELECT n.nid FROM {node} n WHERE n.type='%s'", 'spider_calendar'));
+    while ($a = db_fetch_array($spider_calendar_nodes_col)) {
+      db_query('DELETE FROM {node_comment_statistics} WHERE nid= ' . $a['nid']);
+    }
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function spider_calendar_uninstall() {
+  variable_del('spider_calendar_allowed_tags');
+  variable_del('spider_calendar_node_types');
+  variable_del('spider_calendar_node_types_primary');
+  $spider_calendar_block_count = db_result(db_query("SELECT block_number FROM {spider_calendar_block_number_table} WHERE id='%d'", 1));
+  for ($i = 0; $i < $spider_calendar_block_count; $i++) {
+    variable_del(('spider_calendar_block_select_calendars' . $i));
+  }
+  if (module_exists('comment')) {
+    $spider_calendar_nodes_col = db_query(db_rewrite_sql("SELECT n.nid FROM {node} n WHERE n.type='%s'", 'spider_calendar'));
+    while ($a = db_fetch_array($spider_calendar_nodes_col)) {
+      db_query('DELETE FROM {node_comment_statistics} WHERE nid= ' . $a['nid']);
+    }
+  }
+  variable_del('search_cal_title');
+  variable_del('search_event_title');
+  drupal_uninstall_schema('spider_calendar');
+  // Delete Spider Calendar content type.
+  db_query('DELETE FROM {node} WHERE type = "spider_calendar"');
+}

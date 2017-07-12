@@ -1,0 +1,37 @@
+; Mailhandler ignores
+
+; update_sql cannot be used because it breaks serialized data
+mailhandler.install:321:sql
+
+; Drupal theme function: http://drupal.org/node/898200
+mailhandler.module:41:coder_tough_love
+mailhandler.module:44:coder_tough_love
+mailhandler.install:29:coder_tough_love
+plugins/ctools/export_ui/mailhandler_mailbox_ui.class.php:22:coder_tough_love
+plugins/ctools/export_ui/mailhandler_mailbox_ui.class.php:96:coder_tough_love
+plugins/ctools/export_ui/mailhandler_mailbox_ui.class.php:190:coder_tough_love
+plugins/ctools/export_ui/mailhandler_mailbox_ui.class.php:193:coder_tough_love
+modules/mailhandler_php_imap/plugins/mailhandler/retrieve/MailhandlerPhpImapRetrieve.class.php:27:coder_tough_love
+
+; Sentence case: http://drupal.org/node/337393
+mailhandler.install:272:coder_tough_love
+mailhandler.install:273:coder_tough_love
+mailhandler.install:292:coder_tough_love
+modules/mailhandler_php_imap/plugins/mailhandler/retrieve/MailhandlerPhpImapRetrieve.class.php:292:coder_tough_love
+tests/mailhandler.test:201:coder_tough_love
+
+; "Core uses e-mail" false positive: http://drupal.org/node/1576350
+tests/mailhandler.test:28:coder_tough_love
+tests/mailhandler.test:68:coder_tough_love
+tests/mailhandler.test:69:coder_tough_love
+tests/mailhandler.test:70:coder_tough_love
+tests/mailhandler.test:71:coder_tough_love
+tests/mailhandler.test:72:coder_tough_love
+tests/mailhandler.test:73:coder_tough_love
+tests/mailhandler.test:74:coder_tough_love
+
+; db_rewrite_sql() warning
+mailhandler.install:464:security
+
+; Filtered text warning
+mailhandler.module:213:security

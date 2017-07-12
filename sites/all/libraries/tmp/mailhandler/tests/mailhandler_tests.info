@@ -1,0 +1,14 @@
+name = "Mailhandler module tests"
+description = "Support module for Mailhandler related testing."
+dependencies[] = content
+dependencies[] = filefield
+package = Testing
+version = VERSION
+hidden = TRUE
+
+; Information added by Drupal.org packaging script on 2014-06-10
+version = "6.x-2.10"
+core = "6.x"
+project = "mailhandler"
+datestamp = "1402414129"
+

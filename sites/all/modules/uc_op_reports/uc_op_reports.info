@@ -1,0 +1,13 @@
+name = Ordered Products Reports
+description = Add ordered products reports to user profile pages and add a site-wide report for administrators.
+dependencies[] = uc_order
+dependencies[] = uc_product
+package = Ubercart - extra
+core = 7.x
+
+; Information added by Drupal.org packaging script on 2016-12-14
+version = "7.x-1.2"
+core = "7.x"
+project = "uc_op_reports"
+datestamp = "1481722102"
+

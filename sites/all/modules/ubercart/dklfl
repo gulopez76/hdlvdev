@@ -1,0 +1,65 @@
+/**
+ * Form submission handler for uc_order_edit_form().
+ *
+ * @see uc_order_edit_form()
+ * @see uc_order_edit_form_validate()
+ * @see theme_uc_order_edit_form()
+ */
+function uc_order_edit_form_submit($form, &$form_state) {
+  $order = uc_order_load($form_state['values']['order_id']);
+  $log = array();
+
+  foreach ($form_state['order'] as $key => $value) {
+    if (!isset($order->$key) || $order->$key !== $value) {
+      if (!is_array($value)) {
+        $log[$key] = array('old' => $order->$key, 'new' => $value);
+      }
+      $order->$key = $value;
+    }
+  }
+
+  if (module_exists('uc_stock')) {
+    $qtys = array();
+    foreach ($order->products as $product) {
+      $qtys[$product->order_product_id] = $product->qty;
+    }
+  }
+
+  $order->products = array();
+  if (isset($form_state['values']['products']) && is_array($form_state['values']['products'])) {
+    foreach ($form_state['values']['products'] as $product) {
+/***  GUL    if (!isset($product['remove']) && intval($product['qty']) > 0) { ***/
+      if (!isset($product['remove']) && ($product['qty']) > 0.00) {
+        $product['data'] = unserialize($product['data']);
+        $product = (object)$product;
+        $order->products[] = $product;
+
+        if (module_exists('uc_stock')) {
+          $temp = $product->qty;
+          $product->qty = $product->qty - $qtys[$product->order_product_id];
+          uc_stock_adjust_product_stock($product, 0, $order);
+          $product->qty = $temp;
+        }
+      }
+      if (!isset($product['remove']) && ($product['qty']) < 0.00) {
+        $product['data'] = unserialize($product['data']);
+        $product = (object)$product;
+        drupal_set_message("Product with negative qty eq " . $product->qty); 
+      }
+      else {
+        $log['remove_' . $product['nid']] = $product['title'] . ' removed from order.';
+      }
+    }
+  }
+
+  // Load line items again, since some may have been updated by the form.
+  $order->line_items = uc_order_load_line_items($order);
+
+  uc_order_log_changes($order->order_id, $log);
+
+  field_attach_submit('uc_order', $order, $form, $form_state);
+
+  uc_order_save($order);
+
+  drupal_set_message(t('Order changes saved!!!.'));
+}

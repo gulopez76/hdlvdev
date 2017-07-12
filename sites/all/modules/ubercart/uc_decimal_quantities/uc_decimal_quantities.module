@@ -1,0 +1,475 @@
+<?php
+// $Id$
+/**
+ * @file
+ */
+
+define('UC_DECIMAL_QUANTITIES_FACTOR', 100);
+define('UC_DECIMAL_QUANTITIES_UNIT', 'm');
+define('UC_DECIMAL_QUANTITIES_UNIT_NAME', 'meter');
+define('UC_DECIMAL_QUANTITIES_UNIT_NAME_PLURAL', 'meters');
+define('UC_DECIMAL_QUANTITIES_STORED_UNIT', 'cm');
+
+module_load_include('inc', 'uc_decimal_quantities', 'uc_decimal_quantities.block');
+
+/**
+ * Implementation of hook_menu().
+ */
+function uc_decimal_quantities_menu() {
+  $items = array();
+  $items['admin/store/settings/decimal_quantities'] = array(
+    'title' => 'Decimal Quantities',
+    'description' => 'Administer decimal quantities settings.',
+    'access arguments' => array('administer products'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uc_decimal_quantities_settings'),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => -2,
+    'file' => 'uc_decimal_quantities.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+function uc_decimal_quantities_menu_alter(&$items) {
+  $items['user/%user/orders']['page callback'] = 'uc_decimal_quantities_order_history';
+}
+
+/**
+ * Implementation of hook_uc_price_handler().
+ */
+function uc_decimal_quantities_uc_price_handler() {
+  return array(
+    'alter' => array(
+      'title' => t('Decimal quantities handler'),
+      'description' => t('Multiplies price by the relevant factor.'),
+      'callback' => 'uc_decimal_quantities_price_handler_alter',
+    ),
+  );
+}
+
+/**
+ * Price handler callback function
+ */
+function uc_decimal_quantities_price_handler_alter(&$price, &$context, &$options) {
+  switch ($context['type']) {
+    case 'product':
+    //case 'order_product':
+      // Multiply the stored price to get the per unit price
+      if (_product_allows_decimal_quantities($context['subject']['node'])) {
+        $price['price'] *= UC_DECIMAL_QUANTITIES_FACTOR;
+        //$options['suffixes'][] = ' per '. UC_DECIMAL_QUANTITIES_UNIT;
+        $options['suffixes'][] = '/'. UC_DECIMAL_QUANTITIES_UNIT;
+      }
+      break;
+    default:
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function uc_decimal_quantities_form_alter(&$form, $form_state, $form_id) {
+  // Node forms for product classes which allow decimal quantities.
+  if (strpos($form_id, '_node_form') !== FALSE && in_array(substr($form_id, 0, strpos($form_id, '_')), variable_get('uc_decimal_quantities_product_classes', array()))) {
+    // Display the stored price as the per unit price
+    $form['base']['prices']['list_price']['#default_value'] *= UC_DECIMAL_QUANTITIES_FACTOR;
+    $form['base']['prices']['cost']['#default_value'] *= UC_DECIMAL_QUANTITIES_FACTOR;
+    $form['base']['prices']['sell_price']['#default_value'] *= UC_DECIMAL_QUANTITIES_FACTOR;
+    $form['base']['prices']['#suffix'] = t('<span>All prices are per @unit</span>', array(
+      '@unit' => UC_DECIMAL_QUANTITIES_UNIT_NAME,
+    ));
+
+    // On save divide the price back down to the non-decimal price
+    array_unshift($form['#submit'], 'uc_decimal_quantities_product_node_form_submit');
+  }
+
+  if ($form_id == 'uc_cart_view_form') {
+    foreach ($form['items'] as $key => $item) {
+      if (substr($key, 0, 1) != '#') {
+        // Make it appear as though the customer is purchasing the correct amount rather than hundreds
+        if (_product_allows_decimal_quantities(node_load($item['nid']['#value']))) {
+          $form['items'][$key]['qty']['#default_value'] /= UC_DECIMAL_QUANTITIES_FACTOR;
+          $form['items'][$key]['qty']['#default_value'] = number_format($form['items'][$key]['qty']['#default_value'], 2);
+          $form['items'][$key]['qty']['#description'] = UC_DECIMAL_QUANTITIES_UNIT_NAME_PLURAL;
+        }
+      }
+    }
+
+    // On save multiply the number that was input to get the stored quantity
+    array_unshift($form['update']['#submit'], 'uc_decimal_quantities_cart_view_form_submit');
+    array_unshift($form['checkout']['#submit'], 'uc_decimal_quantities_cart_view_form_submit');
+  }
+
+  if ($form_id == 'uc_order_edit_products_form') {
+    foreach ($form['products'] as $key => $product) {
+      if (is_numeric($key)) {
+        if (_product_allows_decimal_quantities(node_load($product['nid']['#value']))) {
+          $form['products'][$key]['qty']['#value'] /= UC_DECIMAL_QUANTITIES_FACTOR;
+          $form['products'][$key]['qty']['#value'] = number_format($form['products'][$key]['qty']['#value'], 2);
+          $form['products'][$key]['price']['#value'] *= UC_DECIMAL_QUANTITIES_FACTOR;
+          $form['products'][$key]['price']['#value'] = number_format($form['products'][$key]['price']['#value'], 4);
+          $form['products'][$key]['qty']['#description'] = UC_DECIMAL_QUANTITIES_UNIT_NAME_PLURAL;
+        }
+      }
+    }
+  }
+
+  if ($form_id == 'uc_order_edit_form') {
+    array_unshift($form['#submit'], 'uc_decimal_quantities_order_edit_form_submit');
+  }
+
+  if (strpos($form_id, 'uc_product_add_to_cart_form_') === 0) {
+    // Alter display of decimal quantity add to cart forms
+    $nid = substr($form_id, strrpos($form_id, '_') + 1);
+    if(_product_allows_decimal_quantities(node_load($nid))) {
+      $form['qty']['#title'] = t('Amount Required');
+      $form['qty']['#default_value'] = number_format($form['qty']['#default_value'], 2);
+      $form['qty']['#description'] = UC_DECIMAL_QUANTITIES_UNIT_NAME_PLURAL;
+    }
+    // On save multiply the number that was input to get the stored quantity
+    array_unshift($form['#submit'], 'uc_decimal_quantities_cart_view_form_submit');
+
+    // Override the default validate function, if it exists, otherwise add ours to the end.
+    $validate_key = array_search('uc_product_add_to_cart_form_validate', $form['#validate']);
+    if ($validate_key === FALSE) {
+      $form['#validate'][] = 'uc_decimal_quantities_add_to_cart_form_validate';
+    }
+    else {
+      $form['#validate'][$validate_key] = 'uc_decimal_quantities_add_to_cart_form_validate';
+    }
+
+  }
+  elseif (strpos($form_id, 'uc_catalog_buy_it_now_form_') === 0) {
+    $form['#submit'] = array('uc_decimal_quantities_buy_it_now_form_submit');
+  }
+}
+
+/**
+ * Product node form submit handler.
+ * Divides the price entered to store as a whole number
+ */
+function uc_decimal_quantities_product_node_form_submit($form, &$form_state) {
+  $form_state['values']['cost'] /= UC_DECIMAL_QUANTITIES_FACTOR;
+  $form_state['values']['list_price'] /= UC_DECIMAL_QUANTITIES_FACTOR;
+  $form_state['values']['sell_price'] /= UC_DECIMAL_QUANTITIES_FACTOR;
+}
+
+function uc_decimal_quantities_buy_it_now_form_submit($form, &$form_state) {
+  $form_state['redirect'] = uc_cart_add_item($form_state['values']['nid'], UC_DECIMAL_QUANTITIES_FACTOR,  module_invoke_all('add_to_cart_data', $form_state['values']), NULL, variable_get('uc_cart_add_item_msg', TRUE));
+}
+
+/**
+ * Override uc_product_add_to_cart_form_validate() to allow quantities between 0 and 1
+ */
+function uc_decimal_quantities_add_to_cart_form_validate($form, &$form_state) {
+  if (!_product_allows_decimal_quantities($form_state['values']['node'])) {
+    $checkpositive = intval($form_state['values']['qty']);
+  }
+  else {
+    $checkpositive = $form_state['values']['qty'];
+  }
+  if (!is_numeric($form_state['values']['qty']) || $checkpositive <= 0) {
+      form_set_error('qty', t('You have entered an invalid quantity.'));
+  }
+}
+
+/**
+ * Cart view form submit handler
+ * Multiplies the quantity to remove decimals for storage.
+ */
+function uc_decimal_quantities_cart_view_form_submit($form, &$form_state) {
+   if (strpos($form_state['values']['form_id'], 'uc_product_add_to_cart_form') === 0) {
+     if (_product_allows_decimal_quantities(node_load($form_state['values']['nid']))) {
+      $form_state['values']['qty'] *= UC_DECIMAL_QUANTITIES_FACTOR;
+     }
+   }
+   elseif (strpos($form_state['values']['form_id'], 'uc_catalog_buy_it_now_form_') === 0) {
+     dpm($form);
+   }
+   else {
+    foreach ($form_state['values']['items'] as $index => $value) {
+      if (_product_allows_decimal_quantities(node_load($value['nid']))) {
+        $form_state['values']['items'][$index]['qty'] *= UC_DECIMAL_QUANTITIES_FACTOR;
+      }
+    }
+  }
+}
+
+/**
+ * Order edit form submit handler
+ * Multiplies the quantity to remove decimals for storage.
+ */
+function uc_decimal_quantities_order_edit_form_submit($form, &$form_state) {
+  if (is_array($_POST['products'])) {
+    foreach ($_POST['products'] as $key => $product) {
+      if (!isset($product['remove']) && intval($product['qty']) > 0) {
+        if (_product_allows_decimal_quantities($product['nid'])) {
+          $_POST['products'][$key]['qty'] *= UC_DECIMAL_QUANTITIES_FACTOR;
+          $_POST['products'][$key]['price'] /= UC_DECIMAL_QUANTITIES_FACTOR;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_theme_registry_alter().
+ * NOTE: This module must be weighted higher than any other module
+ * which modifies cart_review_table, for example uc_gst.
+ */
+function uc_decimal_quantities_theme_registry_alter(&$registry) {
+  $registry['cart_review_table']['function'] = 'theme_uc_decimal_quantities_cart_review_table';
+  $registry['cart_review_table']['file'] = drupal_get_path('module', 'uc_decimal_quantities') .'/uc_decimal_quantities.module';
+  array_splice($registry['uc_order']['theme paths'], 1, 0, drupal_get_path('module', 'uc_decimal_quantities'). '/template');
+}
+
+
+/**
+ * Show decimal places in the cart review table, while avoiding conflicts with GST module.
+ *
+ * @param $show_subtotal
+ *   TRUE or FALSE indicating if you want a subtotal row displayed in the table.
+ * @return
+ *   The HTML output for the cart review table.
+ *
+ * @ingroup themeable
+ */
+function theme_uc_decimal_quantities_cart_review_table($show_subtotal = TRUE) {
+  if (module_exists('uc_vat')) {
+    module_load_include('inc', 'uc_decimal_quantities', 'includes/uc_decimal_quantities.uc_vat');
+    return uc_decimal_quantities_vat_cart_review_table($show_subtotal);
+  }
+  elseif (module_exists('uc_gst')) {
+    module_load_include('inc', 'uc_decimal_quantities', 'includes/uc_decimal_quantities.uc_gst');
+    return uc_decimal_quantities_gst_cart_review_table($show_subtotal);
+  }
+
+  $subtotal = 0;
+  $subtotal_tax = 0;
+  $subtotal_nontax = 0;
+
+  // Set up table header.
+  $header = array(
+    array('data' => t('Qty'), 'class' => 'qty'),
+    array('data' => t('Products'), 'class' => 'products'),
+    array('data' => t('Price'), 'class' => 'price'),
+  );
+
+
+  $context = array(
+    'location' => 'cart-checkout-item',
+  );
+
+  // Set up table rows.
+  $contents = uc_cart_get_contents();
+  foreach ($contents as $item) {
+    $node = node_load($item->nid);
+    $price_info = array(
+      'price' => $item->price,
+      'qty' => $item->qty,
+    );
+    $context = array(
+      'type' => 'cart_item',
+      'revision' => 'altered',
+      'subject' => array(
+        'cart' => $contents,
+        'cart_item' => $item,
+        'node' => $node,
+      ),
+    );
+
+    $total = uc_price($price_info, $context);
+    $subtotal += $total;
+
+    $description = check_plain($item->title);
+    foreach (module_implements('cart_item_description') as $module) {
+      $description .= module_invoke($module, 'cart_item_description', $item);
+    }
+
+    // Remove node from context to prevent the price from being altered.
+    unset($context['subject']);
+    $context['type'] = 'amount';
+    $context['revision'] = 'themed-original';
+    if (_product_allows_decimal_quantities($item)) {
+      $quantity_cell = array(
+        'data' => t('@qty@unit', array(
+          '@qty' => number_format($item->qty / UC_DECIMAL_QUANTITIES_FACTOR, 2),
+          '@unit' => UC_DECIMAL_QUANTITIES_UNIT,
+        )),
+        'class' => 'qty',
+      );
+    }
+    else {
+      $quantity_cell = array(
+        'data' => t('@qty&times;', array(
+          '@qty' => $item->qty
+        )),
+        'class' => 'qty'
+      );
+    }
+
+    $base_array = array(
+     $quantity_cell,
+      array('data' => $description, 'class' => 'products'),
+      array('data' => uc_price($price, $context), 'class' => 'price'),
+    );
+    $rows[] = $base_array;
+  }
+
+  // Add the subtotal as the final row.
+  if ($show_subtotal) {
+    $context = array(
+      'type' => 'amount',
+      'revision' => 'themed-original',
+    );
+    $rows[] = array(
+      'data' => array(array('data' => '<span id="subtotal-title">' . t('Subtotal:') . '</span> ' . uc_price($subtotal, $context), 'colspan' => 4, 'class' => 'subtotal')),
+      'class' => 'subtotal',
+    );
+  }
+
+  return theme('table', $header, $rows, array('class' => 'cart-review'));
+
+}
+
+/**
+ * Implementation of hook_order().
+ */
+function uc_decimal_quantities_order($op, &$arg1, $arg2) {
+  switch ($op) {
+    case 'load':
+      foreach ($arg1->products as $key => $product) {
+        if (_product_allows_decimal_quantities($product)) {
+          $arg1->products[$key]->price *= UC_DECIMAL_QUANTITIES_FACTOR;
+          $arg1->products[$key]->qty /= UC_DECIMAL_QUANTITIES_FACTOR;
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_checkout_pane().
+ * This pane replaces the existing cart pane as it does not provide appropriate theming functions for cart contents.
+ */
+function uc_decimal_quantities_checkout_pane() {
+  $panes[] = array(
+    'id' => 'decimal_quantities_cart',
+    'callback' => 'uc_decimal_quantities_checkout_pane_cart',
+    'title' => t('Cart contents (including decimal quantities)'),
+    'desc' => t("Display the contents of a customer's shopping cart."),
+    'weight' => 1,
+    'process' => FALSE,
+    'collapsible' => FALSE,
+  );
+  return $panes;
+}
+
+/**
+ * Callback for uc_decimal_quantities_checkout_pane().
+ */
+function uc_decimal_quantities_checkout_pane_cart($op) {
+  module_load_include('inc', 'uc_cart', 'uc_cart_checkout_pane');
+  switch ($op) {
+    case 'view':
+      return uc_checkout_pane_cart($op);
+    case 'review':
+      $items = uc_cart_get_contents();
+      $output = '<table>';
+      $context = array(
+        'revision' => 'themed',
+        'type' => 'cart_item',
+        'subject' => array(),
+      );
+      foreach ($items as $item) {
+        $desc = check_plain($item->title) . uc_product_get_description($item);
+
+        $price_info = array(
+          'price' => $item->price,
+          'qty' => $item->qty,
+        );
+        $context['subject'] = array(
+          'cart' => $items,
+          'cart_item' => $item,
+          'node' => node_load($item->nid),
+        );
+        if (_product_allows_decimal_quantities($item)) {
+          $output .= '<tr valign="top"><td>'. number_format($item->qty / UC_DECIMAL_QUANTITIES_FACTOR, 2) . UC_DECIMAL_QUANTITIES_UNIT . '</td><td width="100%">'. $desc
+                    .'</td><td nowrap="nowrap">'. uc_price($price_info, $context) .'</td></tr>';
+        }
+        else {
+          $output .= '<tr valign="top"><td>'. $item->qty .'&times;</td><td width="100%">'. $desc
+                    .'</td><td nowrap="nowrap">'. uc_price($price_info, $context) .'</td></tr>';
+        }
+      }
+      $output .= '</table>';
+      $review[] = $output;
+      return $review;
+  }
+}
+
+/**
+ * Callback function for order history uc_decimal_quantities_order_history
+ */
+function uc_decimal_quantities_order_history($user) {
+  drupal_set_title(t('My order history'));
+
+  $header = array(
+    array('data' => t('Date'), 'field' => 'o.created', 'sort' => 'desc'),
+    array('data' => t('Order #'), 'field' => 'o.order_id'),
+    array('data' => t('Status'), 'field' => 'os.title'),
+    array('data' => t('Total'), 'field' => 'o.order_total')
+  );
+
+  $rows = array();
+
+  $context = array(
+    'revision' => 'themed-original',
+    'type' => 'amount',
+  );
+
+  $result = pager_query("SELECT o.order_id, o.created, os.title, SUM(op.qty) AS products, o.order_total AS total FROM {uc_orders} AS o LEFT JOIN {uc_order_statuses} AS os ON o.order_status = os.order_status_id LEFT JOIN {uc_order_products} AS op ON o.order_id = op.order_id WHERE o.uid = %d AND o.order_status IN ". uc_order_status_list('general', TRUE) ." GROUP BY o.order_id, o.created, os.title, o.order_total". tablesort_sql($header), 20, 0, "SELECT COUNT(*) FROM {uc_orders} WHERE uid = %d AND order_status NOT IN ". uc_order_status_list('specific', TRUE), $user->uid);
+
+  // Build a table based on the customer's orders.
+  while ($order = db_fetch_object($result)) {
+    $context['subject'] = array('order' => $order);
+
+    $link = l($order->order_id, 'user/'. $user->uid .'/order/'. $order->order_id);
+
+    if (user_access('view all orders')) {
+      $link .= '<span class="order-admin-icons">'. uc_order_actions($order, TRUE) .'</span>';
+    }
+
+    $rows[] = array(
+      array('data' => format_date($order->created, 'custom', variable_get('uc_date_format_default', 'm/d/Y'))),
+      array('data' => $link, 'nowrap' => 'nowrap'),
+      array('data' => $order->title),
+      array('data' => uc_price($order->total, $context), 'align' => 'right'),
+    );
+  }
+
+  if (empty($rows)) {
+    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 5));
+  }
+
+  return theme('table', $header, $rows, array('class' => 'uc-order-history'))
+       . theme('pager', NULL, 20, 0);
+}
+
+function _product_allows_decimal_quantities($product) {
+  if (is_object($product)) {
+    if (!isset($product->type) && isset($product->nid)) {
+      $product = node_load($product->nid);
+    }
+  }
+  if (is_numeric($product)) {
+    $product = node_load($product);
+  }
+  $allowed_types = variable_get('uc_decimal_quantities_product_classes', array());
+  dpm($allowed_types);
+  return in_array($product->type, $allowed_types);
+}

@@ -1,0 +1,13 @@
+name = Job Scheduler
+description = Scheduler API
+core = 6.x
+php = 5.2
+
+files[] = JobScheduler.inc
+
+; Information added by drupal.org packaging script on 2013-09-30
+version = "6.x-1.0-beta3+3-dev"
+core = "6.x"
+project = "job_scheduler"
+datestamp = "1380583859"
+
